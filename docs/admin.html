@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>管理後台｜SIWAN TABLE 西灣食記</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/config.js"></script>
+<style>
+  .admin { display: flex; flex-wrap: wrap; flex: 1 1 auto; }
+  .admin-nav { flex: 1 1 220px; border-right: 1px solid var(--line); padding: 32px 0; }
+  .admin-nav button { width: 100%; text-align: left; min-height: 48px; padding: 0 32px; border: 0; border-left: 2px solid transparent; background: #fff; cursor: pointer; font-size: 15px; color: var(--body); }
+  .admin-nav button[aria-current="page"] { border-left-color: var(--rose); background: var(--blush); color: var(--ink); }
+  .admin-main { flex: 999 1 640px; min-width: 0; padding: 40px 48px 80px; }
+  .kpis { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); border-bottom: 1px solid var(--line); }
+  .kpis > div { padding: 26px 22px 26px 0; display: flex; flex-direction: column; gap: 6px; }
+  .kpis > div + div { padding-left: 22px; border-left: 1px solid var(--line); }
+  .kpis dt { font-family: var(--sans); font-size: 13px; color: var(--muted); }
+  .kpis dd { margin: 0; font-size: 36px; line-height: 1.1; }
+  .kpis dd.small { font-size: 13px; line-height: 1.6; }
+  .panel { padding: 32px 0; border-bottom: 1px solid var(--line); }
+  .panel h2 { margin: 0 0 4px; font-size: 18px; font-weight: 500; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0 48px; }
+  @media (max-width: 720px) { .admin-nav { border-right: 0; border-bottom: 1px solid var(--line); padding: 8px 0; } .admin-main { padding: 28px 20px 64px; } }
+</style>
+</head>
+<body class="page">
+<div class="admin">
+  <nav class="admin-nav" aria-label="後台選單" id="admin-nav">
+    <button type="button" data-view="stats" aria-current="page">總覽與統計</button>
+    <button type="button" data-view="restaurants">餐廳與招牌菜</button>
+    <button type="button" data-view="reservations">預約管理</button>
+    <button type="button" data-view="tags">標籤管理</button>
+    <button type="button" data-view="reviews">評論管理</button>
+    <button type="button" data-view="members">會員管理</button>
+  </nav>
+  <main class="admin-main" id="view"><p class="loading">載入中…</p></main>
+</div>
+
+<dialog id="rest-dialog" aria-labelledby="rest-h" style="max-width:720px">
+  <h2 id="rest-h" style="margin:0 0 18px;font-size:20px;font-weight:500">新增餐廳</h2>
+  <form id="rest-form" class="form" method="dialog">
+    <label class="field">餐廳名稱<input name="rName" required maxlength="255"></label>
+    <label class="field">地址<input name="address"></label>
+    <div class="row">
+      <label class="field">價位<select name="priceRange"><option value="1">$ 平價</option><option value="2">$$ 中價位</option><option value="3">$$$ 高價位</option></select></label>
+      <label class="field">Google 評分<input name="google_rate" type="number" step="0.1" min="0" max="5"></label>
+      <label class="field">Google 評分數<input name="google_num" type="number" min="0"></label>
+    </div>
+    <div class="row">
+      <label class="check" style="flex:1 1 160px"><input type="checkbox" name="acceptRes">接受線上預約</label>
+      <label class="field">總座位數<input name="capacity" type="number" min="1"></label>
+      <label class="field">單筆人數上限<input name="maxPartySize" type="number" min="1" value="4"></label>
+    </div>
+    <label class="field">照片網址（選填）<input name="picture" type="url" placeholder="https://..."></label>
+    <fieldset style="border:0;padding:0;margin:0"><legend style="font-size:14px;color:var(--muted);margin-bottom:8px">標籤</legend>
+      <input type="search" id="tag-filter" placeholder="篩選標籤" style="margin-bottom:10px">
+      <div id="tag-picks" style="display:flex;flex-wrap:wrap;gap:8px;max-height:180px;overflow:auto"></div>
+    </fieldset>
+    <p class="msg err" id="rest-msg" hidden></p>
+    <div class="row" style="justify-content:flex-end">
+      <button type="button" class="btn btn-quiet" data-close>取消</button>
+      <button type="submit" class="btn">儲存</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="menu-dialog" aria-labelledby="menu-h" style="max-width:720px">
+  <h2 id="menu-h" style="margin:0 0 4px;font-size:20px;font-weight:500">招牌菜</h2>
+  <p class="small" id="menu-sub" style="margin:0 0 18px"></p>
+  <div class="table-box"><table class="data"><thead><tr><th>菜名</th><th>價格</th><th>描述</th><th></th></tr></thead><tbody id="menu-rows"></tbody></table></div>
+  <form id="menu-form" class="form" style="margin-top:20px">
+    <div class="row">
+      <label class="field" style="flex:2 1 200px">菜名<input name="menuName" required maxlength="255"></label>
+      <label class="field">價格<input name="price" type="number" min="0"></label>
+    </div>
+    <label class="field">描述<input name="description"></label>
+    <p class="msg err" id="menu-msg" hidden></p>
+    <div class="row" style="justify-content:flex-end">
+      <button type="button" class="btn btn-quiet" data-close>關閉</button>
+      <button type="submit" class="btn" id="menu-submit">新增招牌菜</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module" src="assets/js/pages/admin.js"></script>
+</body>
+</html>

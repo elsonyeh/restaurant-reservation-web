@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>會員中心｜SIWAN TABLE 西灣食記</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/config.js"></script>
+</head>
+<body class="page">
+<main class="wrap" style="padding-top:64px;padding-bottom:96px">
+  <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:28px;border-bottom:1px solid var(--ink)">
+    <div>
+      <p class="eyebrow">MY ACCOUNT</p>
+      <h1 class="page-title" id="hello">會員中心</h1>
+    </div>
+    <dl id="counts" style="margin:0;display:flex;flex-wrap:wrap;gap:8px 40px"></dl>
+  </div>
+  <div class="cols" style="padding-top:48px">
+    <section class="col" aria-labelledby="pf-h">
+      <h2 id="pf-h" class="h-col">PROFILE</h2>
+      <p class="h-col-sub">會員資料</p>
+      <form id="pf-form" class="form">
+        <label class="field">會員編號<input type="text" name="mid" readonly></label>
+        <label class="field">電子信箱（登入帳號）<input type="email" name="email" readonly></label>
+        <label class="field">姓名<input type="text" name="mName" required maxlength="100"></label>
+        <div class="row">
+          <label class="field">生日<input type="date" name="birthday"></label>
+          <label class="field">手機<input type="tel" name="phone" maxlength="20"></label>
+        </div>
+        <label class="field">新密碼（不修改請留空）<input type="password" name="password" autocomplete="new-password" minlength="8"></label>
+        <div class="row" style="align-items:center">
+          <button type="submit" class="btn">儲存變更</button>
+          <p class="msg" id="pf-msg" role="status" hidden></p>
+        </div>
+      </form>
+    </section>
+    <section class="col wide" aria-labelledby="mr-h">
+      <h2 id="mr-h" class="h-col">MY REVIEWS</h2>
+      <p class="h-col-sub" style="margin-bottom:8px">我的評論</p>
+      <ol id="my-reviews" style="margin:0;padding:0;list-style:none"><li class="loading">載入中…</li></ol>
+    </section>
+  </div>
+</main>
+
+<dialog id="edit-dialog" aria-labelledby="edit-h">
+  <h2 id="edit-h" style="margin:0 0 18px;font-size:20px;font-weight:500">修改評論</h2>
+  <form id="edit-form" class="form" method="dialog">
+    <div class="row">
+      <label class="field">評分<select name="rating"><option value="5">5 分</option><option value="4">4 分</option><option value="3">3 分</option><option value="2">2 分</option><option value="1">1 分</option></select></label>
+      <label class="field">用餐日期<input type="date" name="visitDate"></label>
+    </div>
+    <label class="field">評論內容<textarea name="comment" rows="5" maxlength="1000" style="resize:vertical"></textarea></label>
+    <p class="msg err" id="edit-msg" hidden></p>
+    <div class="row" style="justify-content:flex-end">
+      <button type="button" class="btn btn-quiet" id="edit-cancel">取消</button>
+      <button type="submit" class="btn">儲存</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module">
+  import { api, auth, esc, stars, showMsg, toast, requireLogin, $ } from './assets/js/api.js';
+  import { renderLayout } from './assets/js/layout.js';
+  if (requireLogin()) {
+    renderLayout('member');
+    const form = $('#pf-form');
+    let reviews = [];
+    let editing = null;
+
+    async function loadMe() {
+      const m = await api('/me');
+      $('#hello').textContent = `${m.mname}，你好`;
+      form.mid.value = m.mid; form.email.value = m.email; form.mName.value = m.mname;
+      form.birthday.value = m.birthday || ''; form.phone.value = m.phone || '';
+      $('#counts').innerHTML = [['評論', m.review_count], ['有效預約', m.active_reserve_count], ['收藏清單', m.favlist_count]]
+        .map(([k, v]) => `<div><dt class="small">${k}</dt><dd style="margin:0;font-size:26px">${v}</dd></div>`).join('');
+    }
+
+    async function loadReviews() {
+      ({ items: reviews } = await api('/me/reviews'));
+      $('#my-reviews').innerHTML = reviews.length ? reviews.map((v) => `
+        <li style="padding:24px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;align-items:baseline">
+            <a href="restaurant.html?id=${encodeURIComponent(v.rid)}" style="font-size:18px;font-weight:500">${esc(v.rname)}</a>
+            <span class="small">${v.visitdate ? '用餐 ' + v.visitdate : ''}</span>
+          </div>
+          ${stars(v.rating)}
+          ${v.comment ? `<p style="margin:0;font-size:15px;line-height:1.9;color:var(--body);white-space:pre-line">${esc(v.comment)}</p>` : ''}
+          <div style="display:flex;gap:20px">
+            <button type="button" class="link-btn" data-edit="${esc(v.revid)}">修改</button>
+            <button type="button" class="link-btn quiet" data-del="${esc(v.revid)}">刪除</button>
+          </div>
+        </li>`).join('') : '<li class="empty">還沒有寫過評論。<a href="index.html">去找一家店</a></li>';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const { member, token } = await api('/me', { method: 'PUT', body: {
+          mName: form.mName.value, birthday: form.birthday.value || null, phone: form.phone.value, password: form.password.value } });
+        auth.save(token, member);
+        form.password.value = '';
+        showMsg($('#pf-msg'), '已儲存', true);
+        loadMe();
+      } catch (err) { showMsg($('#pf-msg'), err.message); }
+    });
+
+    const dlg = $('#edit-dialog');
+    const ef = $('#edit-form');
+    $('#my-reviews').addEventListener('click', async (e) => {
+      const ed = e.target.closest('[data-edit]');
+      const del = e.target.closest('[data-del]');
+      if (ed) {
+        editing = reviews.find((v) => v.revid === ed.dataset.edit);
+        ef.rating.value = editing.rating; ef.visitDate.value = editing.visitdate || ''; ef.comment.value = editing.comment || '';
+        showMsg($('#edit-msg'), '');
+        dlg.showModal();
+      }
+      if (del && del.dataset.confirm === '1') {
+        try { await api('/reviews/' + encodeURIComponent(del.dataset.del), { method: 'DELETE' }); toast('評論已刪除'); loadReviews(); loadMe(); }
+        catch (err) { toast(err.message); }
+      } else if (del) {
+        del.dataset.confirm = '1'; del.textContent = '確定刪除？'; del.style.color = 'var(--err)';
+        setTimeout(() => { if (del.isConnected) { del.dataset.confirm = ''; del.textContent = '刪除'; del.style.color = ''; } }, 4000);
+      }
+    });
+    $('#edit-cancel').addEventListener('click', () => dlg.close());
+    ef.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await api('/reviews/' + encodeURIComponent(editing.revid), { method: 'PUT', body: {
+          rating: Number(ef.rating.value), visitDate: ef.visitDate.value || null, comment: ef.comment.value } });
+        dlg.close(); toast('評論已更新'); loadReviews();
+      } catch (err) { showMsg($('#edit-msg'), err.message); }
+    });
+
+    loadMe().catch((e) => toast(e.message));
+    loadReviews().catch((e) => { $('#my-reviews').innerHTML = `<li class="empty">${esc(e.message)}</li>`; });
+  }
+</script>
+</body>
+</html>

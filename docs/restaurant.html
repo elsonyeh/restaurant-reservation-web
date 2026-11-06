@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>餐廳資訊｜SIWAN TABLE 西灣食記</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/config.js"></script>
+</head>
+<body class="page">
+<main id="main">
+  <div class="loading">載入中…</div>
+</main>
+
+<dialog id="fav-dialog" aria-labelledby="fav-h">
+  <h2 id="fav-h" style="margin:0 0 6px;font-size:20px;font-weight:500">加入收藏清單</h2>
+  <p class="small" style="margin:0 0 18px">勾選要放進哪些清單</p>
+  <form method="dialog" id="fav-form" class="form">
+    <div id="fav-lists" style="display:flex;flex-direction:column;gap:4px"></div>
+    <div class="row" style="align-items:flex-end">
+      <label class="field">或建立新清單<input type="text" name="newList" placeholder="清單名稱"></label>
+    </div>
+    <p class="msg err" id="fav-msg" hidden></p>
+    <div class="row" style="justify-content:flex-end">
+      <button type="button" class="btn btn-quiet" id="fav-cancel">關閉</button>
+      <button type="submit" class="btn" value="save">儲存</button>
+    </div>
+  </form>
+</dialog>
+<script type="module" src="assets/js/pages/restaurant.js"></script>
+</body>
+</html>

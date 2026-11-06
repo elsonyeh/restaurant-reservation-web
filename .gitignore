@@ -1,0 +1,7 @@
+# 機密設定：資料庫密碼等，不要上傳
+.env
+server/.env
+
+__pycache__/
+*.pyc
+.DS_Store

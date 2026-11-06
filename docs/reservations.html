@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我的預約｜SIWAN TABLE 西灣食記</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/config.js"></script>
+</head>
+<body class="page">
+<main class="wrap" style="padding-top:64px;padding-bottom:96px">
+  <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:32px">
+    <div><p class="eyebrow">RESERVATIONS</p><h1 class="page-title">我的預約</h1></div>
+    <a href="index.html" class="btn">新增預約</a>
+  </div>
+  <div role="tablist" aria-label="預約狀態" id="tabs" style="display:flex;flex-wrap:wrap;gap:4px 32px;border-bottom:1px solid var(--ink)"></div>
+  <ol id="list" style="margin:0;padding:0;list-style:none"><li class="loading">載入中…</li></ol>
+  <p class="small" style="margin-top:32px;line-height:1.9">狀態說明：待確認＝等待管理者確認｜已確認＝預約成立｜已完成＝已到店用餐｜已取消、已拒絕＝座位已釋出。只有「待確認」的預約可以修改。</p>
+</main>
+
+<dialog id="edit-dialog" aria-labelledby="edit-h">
+  <h2 id="edit-h" style="margin:0 0 6px;font-size:20px;font-weight:500">修改預約</h2>
+  <p class="small" id="edit-sub" style="margin:0 0 18px"></p>
+  <form id="edit-form" class="form" method="dialog">
+    <div class="row">
+      <label class="field">日期<input type="date" name="date" required></label>
+      <label class="field">時段<select name="time"></select></label>
+      <label class="field">人數<input type="number" name="size" min="1" max="20" required></label>
+    </div>
+    <label class="field">備註<textarea name="note" rows="2" maxlength="200"></textarea></label>
+    <p class="msg err" id="edit-msg" hidden></p>
+    <div class="row" style="justify-content:flex-end">
+      <button type="button" class="btn btn-quiet" id="edit-cancel">取消</button>
+      <button type="submit" class="btn">儲存</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module">
+  import { api, esc, showMsg, splitDateTime, toast, today, requireLogin, STATUS_LABEL, $ } from './assets/js/api.js';
+  import { renderLayout } from './assets/js/layout.js';
+  const SLOTS = ['11:30', '12:00', '12:30', '13:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'];
+  if (requireLogin()) {
+    renderLayout('reservations');
+    let tab = 'upcoming';
+    let items = [];
+    let editing = null;
+    const TABS = [['upcoming', '即將到來'], ['done', '已完成'], ['cancelled', '已取消'], ['all', '全部']];
+
+    async function load() {
+      const data = await api('/me/reservations', { query: { tab } });
+      items = data.items;
+      $('#tabs').innerHTML = TABS.map(([k, label]) => `
+        <button type="button" role="tab" aria-selected="${k === tab}" data-tab="${k}"
+          style="background:none;border:0;padding:14px 0 12px;margin-bottom:-1px;font-size:16px;cursor:pointer;min-height:44px;border-bottom:2px solid ${k === tab ? 'var(--rose);color:var(--ink)' : 'transparent;color:var(--muted)'}">
+          ${label} <span class="small">${data.counts[k]}</span></button>`).join('');
+      $('#list').innerHTML = items.length ? items.map((r) => {
+        const d = splitDateTime(r.datetime);
+        const canEdit = r.status === 'pending' && r.upcoming;
+        const canCancel = ['pending', 'confirmed'].includes(r.status) && r.upcoming;
+        const canReview = !r.reviewed && (r.status === 'completed' || (r.status === 'confirmed' && !r.upcoming));
+        return `
+        <li style="display:flex;flex-wrap:wrap;align-items:center;gap:16px 36px;padding:28px 0;border-bottom:1px solid var(--line)">
+          <div style="flex:0 0 96px;display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:13px;color:var(--rose);letter-spacing:.2em">${d.month}</span>
+            <span style="font-size:34px;line-height:1.1">${d.day}</span>
+            <span class="small">${d.week}</span>
+          </div>
+          <div style="flex:1 1 260px;display:flex;flex-direction:column;gap:6px;min-width:0">
+            <a href="restaurant.html?id=${encodeURIComponent(r.rid)}" style="font-size:20px;font-weight:500">${esc(r.rname)}</a>
+            <span class="small" style="font-size:14px;color:var(--muted)">${d.time}・${r.partysize} 位・預約編號 ${esc(r.resid)}</span>
+            ${r.note ? `<span class="small">備註：${esc(r.note)}</span>` : ''}
+          </div>
+          <span class="badge ${esc(r.status)}">${STATUS_LABEL[r.status] || esc(r.status)}</span>
+          <div style="flex:0 0 auto;display:flex;gap:20px">
+            ${canEdit ? `<button type="button" class="link-btn" data-edit="${esc(r.resid)}">修改</button>` : ''}
+            ${canCancel ? `<button type="button" class="link-btn quiet" data-cancel="${esc(r.resid)}">取消預約</button>` : ''}
+            ${canReview ? `<a class="link-btn" href="restaurant.html?id=${encodeURIComponent(r.rid)}#rev-h">寫評論</a>` : ''}
+          </div>
+        </li>`;
+      }).join('') : '<li class="empty">這裡還沒有預約紀錄。</li>';
+    }
+
+    $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) { tab = b.dataset.tab; load(); } });
+
+    const dlg = $('#edit-dialog');
+    const ef = $('#edit-form');
+    ef.time.innerHTML = SLOTS.map((t) => `<option>${t}</option>`).join('');
+    $('#list').addEventListener('click', async (e) => {
+      const ed = e.target.closest('[data-edit]');
+      const ca = e.target.closest('[data-cancel]');
+      if (ed) {
+        editing = items.find((r) => r.resid === ed.dataset.edit);
+        const d = splitDateTime(editing.datetime);
+        $('#edit-sub').textContent = editing.rname;
+        ef.date.min = today(); ef.date.value = d.date; ef.time.value = d.time; ef.size.value = editing.partysize; ef.note.value = editing.note || '';
+        showMsg($('#edit-msg'), '');
+        dlg.showModal();
+      }
+      if (ca && ca.dataset.confirm === '1') {
+        try { await api(`/reservations/${encodeURIComponent(ca.dataset.cancel)}/cancel`, { method: 'POST' }); toast('預約已取消，座位已釋出'); load(); }
+        catch (err) { toast(err.message); }
+      } else if (ca) {
+        ca.dataset.confirm = '1'; ca.textContent = '確定取消？'; ca.style.color = 'var(--err)';
+        setTimeout(() => { if (ca.isConnected) { ca.dataset.confirm = ''; ca.textContent = '取消預約'; ca.style.color = ''; } }, 4000);
+      }
+    });
+    $('#edit-cancel').addEventListener('click', () => dlg.close());
+    ef.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await api('/reservations/' + encodeURIComponent(editing.resid), { method: 'PUT', body: {
+          dateTime: `${ef.date.value} ${ef.time.value}`, partySize: Number(ef.size.value), note: ef.note.value } });
+        dlg.close(); toast('預約已更新'); load();
+      } catch (err) { showMsg($('#edit-msg'), err.message); }
+    });
+
+    load().catch((e) => { $('#list').innerHTML = `<li class="empty">${esc(e.message)}</li>`; });
+  }
+</script>
+</body>
+</html>

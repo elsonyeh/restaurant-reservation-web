@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIWAN TABLE 西灣食記｜中山大學周邊餐廳評價與搜尋</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/config.js"></script>
+</head>
+<body class="page">
+<main>
+  <section aria-label="主視覺" class="wrap-wide" style="max-width:1440px">
+    <img src="assets/img/hero.jpg" alt="黃昏時的鹽埕老街，小吃店透出暖色燈光" style="width:100%;height:clamp(280px,42vw,560px);object-fit:cover;object-position:center 60%">
+  </section>
+
+  <section class="wrap" style="padding-top:72px;padding-bottom:24px;text-align:center">
+    <p class="eyebrow">KAOHSIUNG · YANCHENG &amp; GUSHAN</p>
+    <h1 style="margin:18px 0 0;font-size:clamp(26px,4vw,36px);font-weight:400;letter-spacing:.08em;line-height:1.5">鹽埕與鼓山，一頓好飯的距離</h1>
+    <p style="margin:16px auto 0;max-width:620px;font-size:17px;line-height:2;color:var(--muted)">從中山大學出發，找一家適合今天的店。看評論、存清單，想好了就直接訂位。</p>
+  </section>
+
+  <section aria-labelledby="search-h" class="wrap" style="padding-top:40px;padding-bottom:72px">
+    <div style="border-top:1px solid var(--rose);padding-top:36px">
+      <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-bottom:28px">
+        <h2 id="search-h" style="margin:0;font-size:24px;font-weight:500;letter-spacing:.06em">SEARCH</h2>
+        <span style="font-size:16px;color:var(--faint)">搜尋餐廳</span>
+      </div>
+      <form id="search-form" class="row" role="search">
+        <label class="field" style="flex:3 1 280px">關鍵字
+          <input type="search" name="q" placeholder="店名、地址、標籤或招牌菜，例如：咖哩、滷味">
+        </label>
+        <label class="field" style="flex:1 1 140px">區域
+          <select name="district"><option value="">全部區域</option><option>鹽埕區</option><option>鼓山區</option></select>
+        </label>
+        <label class="field" style="flex:1 1 140px">價位
+          <select name="price"><option value="">不限</option><option value="1">$ 平價</option><option value="2">$$ 中價位</option><option value="3">$$$ 高價位</option></select>
+        </label>
+        <label class="field" style="flex:1 1 170px">排序
+          <select name="sort"><option value="google">Google 評分高到低</option><option value="member">會員評分高到低</option><option value="reviews">評論數最多</option><option value="price">價位低到高</option></select>
+        </label>
+        <button type="submit" class="btn" style="letter-spacing:.2em">搜尋</button>
+      </form>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;margin-top:26px">
+        <span style="font-size:14px;color:var(--muted)">標籤</span>
+        <div id="tag-buttons" style="display:flex;flex-wrap:wrap;gap:10px;flex:1 1 400px"></div>
+        <label class="check"><input type="checkbox" id="accept-res">只看可線上預約</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:88px">
+    <div class="cols">
+      <div class="col">
+        <h2 class="h-col" style="margin-bottom:22px">ABOUT</h2>
+        <p style="margin:0;font-size:16px;line-height:2.1;color:var(--body)">西灣食記收錄中山大學周邊、鹽埕與鼓山兩區的餐廳。每家店附上價位、標籤與 Google 評分，會員可以留下自己的評論、把喜歡的店整理成收藏清單，接受預約的店家則能直接線上訂位。</p>
+      </div>
+      <div class="col">
+        <h2 class="h-col" style="margin-bottom:22px">INFORMATION</h2>
+        <ul class="bullets" id="summary"><li>載入中…</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="list-h" class="wrap" style="padding-bottom:96px" id="results">
+    <div class="sec-head">
+      <div><h2 id="list-h" style="display:inline">RESTAURANTS</h2><span class="sub">餐廳列表</span></div>
+      <span class="meta" id="result-meta" aria-live="polite"></span>
+    </div>
+    <ol class="rest-list" id="rest-list"><li class="loading">載入中…</li></ol>
+    <nav class="pager" id="pager" aria-label="分頁"></nav>
+  </section>
+
+  <section aria-labelledby="tag-h" class="marble" style="padding:88px 0">
+    <div class="wrap" style="text-align:center">
+      <h2 id="tag-h" style="margin:0;font-size:24px;font-weight:500;letter-spacing:.06em">BROWSE BY TAG</h2>
+      <p style="margin:10px 0 0;font-size:16px;color:var(--muted)">依標籤找餐廳 ｜ 數字為收錄店家數</p>
+      <ul id="tag-cloud" style="margin:36px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:14px 34px;font-size:18px"></ul>
+    </div>
+  </section>
+</main>
+<script type="module" src="assets/js/pages/index.js"></script>
+</body>
+</html>
