@@ -16,7 +16,7 @@ async function load() {
     main.innerHTML = `<p class="empty">${esc(e.message)}　<a href="index.html">回到探索餐廳</a></p>`;
     return;
   }
-  document.title = `${rest.rname}｜好位 GOOD SEAT`;
+  document.title = `${rest.rname}｜留席 SAVED SEAT`;
   render();
   if (rest.acceptres) loadSlots();
 }

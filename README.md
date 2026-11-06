@@ -1,4 +1,4 @@
-# 好位 GOOD SEAT
+# 留席 SAVED SEAT
 
 資料庫系統 專案一（第 8 組）：中山大學周邊（鹽埕區、鼓山區）餐廳評價、搜尋與線上預約系統。
 
@@ -105,7 +105,7 @@ GitHub Pages 只放靜態檔案，不能執行 Python，也不能直接連 Postg
 ## 測試帳號
 
 - 課程資料庫：沿用組員建立的測試帳號（例如 `test01@example.com` 為管理者）。這些帳號的密碼是明碼，系統相容；新註冊的帳號則以雜湊儲存。
-- 本機測試資料庫（`python db/init_local_db.py` 建立）：`admin@goodseat.test / admin1234`（管理者）、`yijun@goodseat.test / user1234`（會員）。
+- 本機測試資料庫（`python db/init_local_db.py` 建立）：`admin@savedseat.test / admin1234`（管理者）、`yijun@savedseat.test / user1234`（會員）。
 
 ## 資料來源
 
