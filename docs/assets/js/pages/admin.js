@@ -35,16 +35,16 @@ const views = {
         <div><dt>待確認預約</dt><dd style="color:var(--rose)">${t.pending}</dd><dd class="small">Google 平均 ${t.avg_google ?? '—'}</dd></div>
       </dl>
       <div class="grid2">
-        <section class="panel"><h2>各價位餐廳數</h2><p class="small" style="margin:0 0 20px">GROUP BY priceRange</p>
+        <section class="panel"><h2>各價位餐廳數</h2><p class="small" style="margin:0 0 20px">依價位分類</p>
           ${bars(d.byPrice, (x) => ['', '$ 平價', '$$ 中價位', '$$$ 高價位'][x.key] || x.key)}</section>
-        <section class="panel"><h2>各區域餐廳數</h2><p class="small" style="margin:0 0 20px">依地址判斷行政區，附平均 Google 評分</p>
+        <section class="panel"><h2>各區域餐廳數</h2><p class="small" style="margin:0 0 20px">括號內為平均 Google 評分</p>
           ${bars(d.byDistrict, (x) => `${x.key}（${x.avg_google ?? '—'}）`)}</section>
-        <section class="panel"><h2>最常見的標籤</h2><p class="small" style="margin:0 0 20px">COUNT(*) FROM HasTag GROUP BY tName</p>${bars(d.topTags)}</section>
+        <section class="panel"><h2>最常見的標籤</h2><p class="small" style="margin:0 0 20px">使用該標籤的餐廳數</p>${bars(d.topTags)}</section>
         <section class="panel"><h2>預約狀態</h2><p class="small" style="margin:0 0 20px">各狀態筆數（括號內為總人數）</p>
           ${bars(statusItems, (x) => `${x.key}（${x.people} 人）`)}</section>
         <section class="panel"><h2>預約最多的餐廳</h2><p class="small" style="margin:0 0 20px">不含已取消、已拒絕；括號內為平均人數</p>
           ${d.topReserved.length ? bars(d.topReserved, (x) => `${x.key}（${x.avg_size}）`) : '<p class="muted">尚無資料</p>'}</section>
-        <section class="panel"><h2>會員評分最高的餐廳</h2><p class="small" style="margin:0 0 20px">AVG(rating)，括號內為評論數</p>
+        <section class="panel"><h2>會員評分最高的餐廳</h2><p class="small" style="margin:0 0 20px">會員平均評分，括號內為評論數</p>
           ${d.topRated.length ? `<ul class="bars">${d.topRated.map((x) => `<li><span class="k" style="flex-basis:180px">${esc(x.key)}</span><span class="track"><span class="fill" style="width:${x.avg * 20}%"></span></span><span class="v">${x.avg}（${x.n}）</span></li>`).join('')}</ul>` : '<p class="muted">尚無資料</p>'}</section>
       </div>`;
   },
@@ -61,7 +61,7 @@ const views = {
           <button class="btn btn-dark btn-sm" type="button" id="add-rest">＋ 新增餐廳</button></form>
       </div>
       <div class="table-box" style="margin-top:8px"><table class="data" style="min-width:860px">
-        <thead><tr><th>rId</th><th>餐廳名稱</th><th>區域</th><th>價位</th><th>Google</th><th>預約</th><th>座位</th><th>操作</th></tr></thead>
+        <thead><tr><th>編號</th><th>餐廳名稱</th><th>區域</th><th>價位</th><th>Google</th><th>預約</th><th>座位</th><th>操作</th></tr></thead>
         <tbody>${d.items.map((r) => `
           <tr><td class="small">${esc(r.rid)}</td><td class="strong">${esc(r.rname)}</td><td>${esc(r.district)}</td>
             <td style="letter-spacing:.08em">${priceHtml(r.pricerange)}</td>
@@ -127,7 +127,7 @@ const views = {
     view.innerHTML = `
       <p class="eyebrow">TAGS</p><h1 class="page-title" style="font-size:30px;padding-bottom:24px;border-bottom:1px solid var(--ink)">標籤管理</h1>
       <form id="tag-new" class="row" style="margin:24px 0"><label class="field" style="flex:0 1 320px">新增標籤<input name="tName" required maxlength="100"></label><button class="btn btn-sm" type="submit">新增</button></form>
-      <div class="table-box"><table class="data"><thead><tr><th>tId</th><th>標籤名稱</th><th>使用的餐廳數</th><th>操作</th></tr></thead>
+      <div class="table-box"><table class="data"><thead><tr><th>編號</th><th>標籤名稱</th><th>使用的餐廳數</th><th>操作</th></tr></thead>
         <tbody>${items.map((t) => `<tr><td class="small">${esc(t.tid)}</td>
           <td><input value="${esc(t.tname)}" data-name="${esc(t.tid)}" aria-label="標籤名稱" style="max-width:260px;padding:6px 10px"></td>
           <td>${t.n}</td><td style="white-space:nowrap"><button class="link-btn" data-save="${esc(t.tid)}">儲存</button>　<button class="link-btn quiet" data-del="${esc(t.tid)}">刪除</button></td></tr>`).join('')}</tbody></table></div>`;
@@ -165,7 +165,7 @@ const views = {
     const { items } = await api('/admin/members');
     view.innerHTML = `
       <p class="eyebrow">MEMBERS</p><h1 class="page-title" style="font-size:30px;padding-bottom:24px;border-bottom:1px solid var(--ink)">會員管理</h1>
-      <div class="table-box"><table class="data" style="min-width:820px"><thead><tr><th>mId</th><th>姓名</th><th>信箱</th><th>手機</th><th>評論</th><th>預約</th><th>身分</th><th></th></tr></thead>
+      <div class="table-box"><table class="data" style="min-width:820px"><thead><tr><th>編號</th><th>姓名</th><th>信箱</th><th>手機</th><th>評論</th><th>預約</th><th>身分</th><th></th></tr></thead>
         <tbody>${items.map((m) => `<tr><td class="small">${esc(m.mid)}</td><td class="strong">${esc(m.mname)}</td><td>${esc(m.email)}</td><td>${esc(m.phone || '')}</td>
           <td>${m.reviews}</td><td>${m.reservations}</td>
           <td><select data-role="${esc(m.mid)}" aria-label="身分" style="padding:6px 10px;width:auto"><option value="user"${m.role !== 'admin' ? ' selected' : ''}>一般會員</option><option value="admin"${m.role === 'admin' ? ' selected' : ''}>管理者</option></select></td>

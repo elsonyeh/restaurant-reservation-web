@@ -12,10 +12,9 @@ async function loadSummary() {
     $('#summary').innerHTML = `
       <li>收錄餐廳 ${s.restaurants} 家</li>
       <li>鹽埕區 ${s.yancheng} 家 · 鼓山區 ${s.gushan} 家</li>
-      <li>平均 Google 評分 ${s.avg_google ?? '—'}</li>
-      <li>平價（$）餐廳 ${s.cheap} 家 · 可線上預約 ${s.accept_res} 家</li>`;
+      <li>可線上訂位 ${s.accept_res} 家</li>`;
   } catch (e) {
-    $('#summary').innerHTML = `<li>${esc(e.message)}</li>`;
+    $('#summary').innerHTML = '<li>暫時無法載入，請稍後再試</li>';
   }
 }
 
@@ -31,6 +30,10 @@ async function loadTags() {
 async function loadList() {
   const list = $('#rest-list');
   list.innerHTML = '<li class="loading">載入中…</li>';
+  const slow = setTimeout(() => {
+    const el = list.querySelector('.loading');
+    if (el) el.textContent = '第一次開啟需要稍等一下，資料載入中…';
+  }, 4000);
   try {
     const data = await api('/restaurants', {
       query: {
@@ -48,7 +51,7 @@ async function loadList() {
           <span class="no">${String(start + i + 1).padStart(2, '0')}</span>
           <div class="name">
             <a href="restaurant.html?id=${r.rid}">${esc(r.rname)}</a>
-            <span>${esc(r.district)}${r.acceptres ? '　·　可線上預約' : ''}</span>
+            <span>${esc(r.district)}${r.acceptres ? '　·　可線上訂位' : ''}</span>
           </div>
           <div class="tags chips">${(r.tags || []).slice(0, 4).map((t) => `<span class="chip">${esc(t)}</span>`).join('')}</div>
           <div class="price">${priceHtml(r.pricerange)}</div>
@@ -60,7 +63,9 @@ async function loadList() {
         </li>`).join('');
     }
     renderPager(data.total, data.pageSize);
+    clearTimeout(slow);
   } catch (e) {
+    clearTimeout(slow);
     list.innerHTML = `<li class="empty">${esc(e.message)}</li>`;
     $('#pager').innerHTML = '';
   }

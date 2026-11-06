@@ -1,4 +1,4 @@
-"""SIWAN TABLE 西灣食記：校園周邊餐廳評價與搜尋系統（Flask 後端）
+"""SIWAN RESERVE 西灣好位：校園周邊餐廳評價與搜尋系統（Flask 後端）
 
 執行：python app.py
 本機執行時，http://127.0.0.1:5000 同時提供前端頁面（docs 資料夾）與 API（/api/...）。
@@ -68,9 +68,9 @@ def create_app():
     def handle_db_error(err):
         code = getattr(err, "pgcode", None)
         messages = {
-            "23505": (409, "資料重複，違反唯一性限制"),
-            "23503": (400, "關聯的資料不存在"),
-            "23514": (400, "資料不符合欄位限制"),
+            "23505": (409, "資料重複，請確認後再試"),
+            "23503": (400, "相關資料不存在"),
+            "23514": (400, "資料格式不正確"),
             "22P02": (400, "資料格式錯誤"),
             "22007": (400, "日期時間格式錯誤"),
             "22008": (400, "日期時間超出範圍"),
@@ -79,11 +79,11 @@ def create_app():
             status, msg = messages[code]
             return jsonify(error=msg), status
         app.logger.exception(err)
-        return jsonify(error="資料庫發生錯誤"), 500
+        return jsonify(error="系統忙碌中，請稍後再試"), 500
 
     @app.errorhandler(404)
     def not_found(_err):
-        return jsonify(error="找不到這個頁面或 API"), 404
+        return jsonify(error="找不到這個頁面"), 404
 
     # ---- 前端靜態頁面（與 GitHub Pages 上的 docs 資料夾相同）----
     @app.get("/")
@@ -101,5 +101,5 @@ app = create_app()
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
-    print(f"SIWAN TABLE 已啟動：http://127.0.0.1:{port}")
+    print(f"SIWAN RESERVE 已啟動：http://127.0.0.1:{port}")
     app.run(host="127.0.0.1", port=port, debug=False)

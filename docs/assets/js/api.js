@@ -27,7 +27,7 @@ export async function api(path, { method = 'GET', body, query } = {}) {
   try {
     res = await fetch(url, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined });
   } catch {
-    throw new Error('連不到後端伺服器，請確認後端已啟動、網址設定正確');
+    throw new Error('目前無法連線，請稍後再試');
   }
   let data = null;
   try { data = await res.json(); } catch { /* 沒有內容 */ }

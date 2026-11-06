@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>會員中心｜SIWAN TABLE 西灣食記</title>
+<title>會員中心｜SIWAN RESERVE 西灣好位</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -24,7 +24,6 @@
       <h2 id="pf-h" class="h-col">PROFILE</h2>
       <p class="h-col-sub">會員資料</p>
       <form id="pf-form" class="form">
-        <label class="field">會員編號<input type="text" name="mid" readonly></label>
         <label class="field">電子信箱（登入帳號）<input type="email" name="email" readonly></label>
         <label class="field">姓名<input type="text" name="mName" required maxlength="100"></label>
         <div class="row">
@@ -74,7 +73,7 @@
     async function loadMe() {
       const m = await api('/me');
       $('#hello').textContent = `${m.mname}，你好`;
-      form.mid.value = m.mid; form.email.value = m.email; form.mName.value = m.mname;
+      form.email.value = m.email; form.mName.value = m.mname;
       form.birthday.value = m.birthday || ''; form.phone.value = m.phone || '';
       $('#counts').innerHTML = [['評論', m.review_count], ['有效預約', m.active_reserve_count], ['收藏清單', m.favlist_count]]
         .map(([k, v]) => `<div><dt class="small">${k}</dt><dd style="margin:0;font-size:26px">${v}</dd></div>`).join('');

@@ -1,9 +1,7 @@
 // 後端 API 的網址。
 // - 本機執行（python app.py 後開 http://127.0.0.1:5050）：前後端同一個網址，不用設定。
-// - GitHub Pages：後端網址會變動（例如 Cloudflare Tunnel 每次啟動都不同），
-//   所以第一次打開時在網址後面加上 ?api=後端網址，例如
-//   https://elsonyeh.github.io/restaurant-reservation-web/?api=https://xxxx.trycloudflare.com
-//   瀏覽器會記住這個設定。若後端有固定網址（例如 Render），直接填在下面的 DEFAULT_API。
+// - GitHub Pages：使用下面 DEFAULT_API 的後端網址（Render）。
+//   測試其他後端時，可在網址後加上 ?api=後端網址，瀏覽器會記住；加上 ?api= 留空則恢復預設。
 (function () {
   var DEFAULT_API = 'https://restaurant-reservation-api-5i11.onrender.com';
   var onPages = /\.github\.io$/.test(location.hostname);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>我的預約｜SIWAN TABLE 西灣食記</title>
+<title>我的預約｜SIWAN RESERVE 西灣好位</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
   </div>
   <div role="tablist" aria-label="預約狀態" id="tabs" style="display:flex;flex-wrap:wrap;gap:4px 32px;border-bottom:1px solid var(--ink)"></div>
   <ol id="list" style="margin:0;padding:0;list-style:none"><li class="loading">載入中…</li></ol>
-  <p class="small" style="margin-top:32px;line-height:1.9">狀態說明：待確認＝等待管理者確認｜已確認＝預約成立｜已完成＝已到店用餐｜已取消、已拒絕＝座位已釋出。只有「待確認」的預約可以修改。</p>
+  <p class="small" style="margin-top:32px;line-height:1.9">狀態說明：待確認＝等待店家確認｜已確認＝預約成立｜已完成＝已到店用餐｜已取消、已拒絕＝預約不成立。只有「待確認」的預約可以修改。</p>
 </main>
 
 <dialog id="edit-dialog" aria-labelledby="edit-h">
@@ -101,7 +101,7 @@
         dlg.showModal();
       }
       if (ca && ca.dataset.confirm === '1') {
-        try { await api(`/reservations/${encodeURIComponent(ca.dataset.cancel)}/cancel`, { method: 'POST' }); toast('預約已取消，座位已釋出'); load(); }
+        try { await api(`/reservations/${encodeURIComponent(ca.dataset.cancel)}/cancel`, { method: 'POST' }); toast('預約已取消'); load(); }
         catch (err) { toast(err.message); }
       } else if (ca) {
         ca.dataset.confirm = '1'; ca.textContent = '確定取消？'; ca.style.color = 'var(--err)';

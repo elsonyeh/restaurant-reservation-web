@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>登入 / 註冊｜SIWAN TABLE 西灣食記</title>
+<title>登入 / 註冊｜SIWAN RESERVE 西灣好位</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -26,7 +26,6 @@
           <label class="field">密碼<input type="password" name="password" autocomplete="current-password" required></label>
           <p class="msg err" id="login-msg" role="alert" hidden></p>
           <button type="submit" class="btn" style="letter-spacing:.24em">登入</button>
-          <p class="small" style="margin:0;line-height:1.8">管理者帳號登入後會直接進入管理後台。</p>
         </form>
       </section>
       <section class="col" aria-labelledby="reg-h">
@@ -34,7 +33,7 @@
         <p class="h-col-sub">第一次使用，建立帳號</p>
         <form id="reg-form" class="form">
           <label class="field">姓名<input type="text" name="mName" autocomplete="name" required maxlength="100"></label>
-          <label class="field">電子信箱（作為登入帳號，不可重複）<input type="email" name="email" autocomplete="email" required></label>
+          <label class="field">電子信箱<input type="email" name="email" autocomplete="email" required></label>
           <label class="field">密碼（至少 8 個字元）<input type="password" name="password" autocomplete="new-password" minlength="8" required></label>
           <div class="row">
             <label class="field">生日<input type="date" name="birthday"></label>

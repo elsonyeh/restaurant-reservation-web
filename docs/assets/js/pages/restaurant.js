@@ -16,7 +16,7 @@ async function load() {
     main.innerHTML = `<p class="empty">${esc(e.message)}　<a href="index.html">回到探索餐廳</a></p>`;
     return;
   }
-  document.title = `${rest.rname}｜SIWAN TABLE 西灣食記`;
+  document.title = `${rest.rname}｜SIWAN RESERVE 西灣好位`;
   render();
   if (rest.acceptres) loadSlots();
 }
@@ -74,7 +74,7 @@ function render() {
         <ul class="bullets">
           <li>${esc(r.address || '地址未提供')}</li>
           <li>價位 ${'$'.repeat(Number(r.pricerange) || 0) || '—'}・建議 1–${r.maxpartysize || 4} 人用餐</li>
-          <li>${r.acceptres ? `接受線上預約・單筆上限 ${r.maxpartysize} 人・總座位 ${r.capacity} 位` : '不接受線上預約'}</li>
+          <li>${r.acceptres ? `可線上訂位・每筆最多 ${r.maxpartysize} 人` : '不提供線上訂位'}</li>
         </ul>
       </div>
       <div class="col">
@@ -124,7 +124,7 @@ function render() {
         <p class="msg err" id="res-msg" hidden></p>
         <div class="row" style="align-items:center">
           <button type="submit" class="btn" style="letter-spacing:.2em">送出預約</button>
-          <span class="small">送出後狀態為「待確認」，可在「我的預約」查看</span>
+          <span class="small">送出後可在「我的預約」查看狀態</span>
         </div>
       </form>
       <aside aria-label="預約說明" style="flex:1 1 260px;border-left:1px solid var(--line-strong);padding-left:40px">
@@ -132,9 +132,9 @@ function render() {
         <p style="margin:6px 0 0;font-size:20px;font-weight:500" id="sel-label">請選擇時段</p>
         <p style="margin:6px 0 22px;font-size:15px;color:var(--body)" id="sel-seats"></p>
         <ul class="bullets" style="font-size:14px;gap:12px">
-          <li>前後 2 小時內已預約的人數加上本次人數，不能超過總座位數</li>
           <li>額滿或已過的時段無法選擇</li>
-          <li>取消預約後，座位會立即釋出</li>
+          <li>預約送出後由店家確認，結果會顯示在「我的預約」</li>
+          <li>行程有變請提早取消</li>
         </ul>
       </aside>
     </div>
@@ -193,8 +193,8 @@ async function loadSlots() {
     const data = await api(`/restaurants/${encodeURIComponent(rid)}/availability`, { query: { date: form.date.value } });
     box.innerHTML = data.slots.map((s) => {
       const disabled = s.past || s.seats_left < size;
-      const sub = s.past ? '已過' : s.seats_left <= 0 ? '額滿' : `剩 ${s.seats_left} 位`;
-      return `<button type="button" class="tag-btn" data-time="${s.time}" data-left="${s.seats_left}" aria-pressed="${selectedSlot === s.time && !disabled}"
+      const sub = s.past ? '已過' : s.seats_left < size ? '額滿' : s.seats_left <= 8 ? '名額有限' : '可預約';
+      return `<button type="button" class="tag-btn" data-time="${s.time}" aria-pressed="${selectedSlot === s.time && !disabled}"
                 ${disabled ? 'disabled' : ''} style="min-width:92px;min-height:52px;padding:6px 14px;font-size:15px;${disabled ? 'color:#9C918E;background:#FAF8F8;cursor:not-allowed;text-decoration:line-through' : ''}">
                 ${s.time}<span style="display:block;font-size:12px;color:var(--faint);text-decoration:none">${sub}</span></button>`;
     }).join('');
@@ -214,7 +214,7 @@ function updateSelected() {
     if (!b.disabled) { b.style.background = on ? 'var(--rose)' : '#fff'; b.style.color = on ? '#fff' : ''; b.style.borderColor = on ? 'var(--rose)' : ''; }
   });
   $('#sel-label').textContent = btn ? `${form.date.value.slice(5).replace('-', ' 月 ')} 日 ${selectedSlot}` : '請選擇時段';
-  $('#sel-seats').textContent = btn ? `${form.size.value} 位・此時段剩餘 ${btn.dataset.left} 位` : '';
+  $('#sel-seats').textContent = btn ? `${form.size.value} 位` : '';
 }
 
 function bind() {
@@ -238,7 +238,7 @@ function bind() {
       try {
         await api('/reservations', { method: 'POST', body: { rId: rid, dateTime: `${resForm.date.value} ${selectedSlot}`, partySize: Number(resForm.size.value), note: resForm.note.value } });
         showMsg(msg, '');
-        toast('預約已送出，狀態為「待確認」');
+        toast('預約已送出，等待店家確認');
         setTimeout(() => { location.href = 'reservations.html'; }, 900);
       } catch (err) {
         showMsg(msg, err.message);
