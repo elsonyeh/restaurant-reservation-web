@@ -1,0 +1,28 @@
+# Render 部署設定（New → Blueprint 選這個 repo 就會照這份設定建立後端）
+services:
+  - type: web
+    name: siwan-table-api
+    runtime: python
+    region: singapore
+    plan: free
+    rootDir: server
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DB_HOST
+        value: 140.117.68.35
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_USER
+        value: project_8
+      - key: DB_NAME
+        value: project_8
+      - key: DB_PASSWORD
+        sync: false          # 建立時由你在 Render 畫面上填入，不會存在 GitHub
+      - key: SECRET_KEY
+        generateValue: true  # Render 自動產生隨機密鑰
+      - key: CORS_ORIGINS
+        value: https://elsonyeh.github.io
