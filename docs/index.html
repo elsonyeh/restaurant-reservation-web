@@ -12,8 +12,20 @@
 </head>
 <body class="page">
 <main>
-  <section aria-label="主視覺" class="wrap-wide" style="max-width:1440px">
-    <img src="assets/img/hero.jpg" alt="黃昏時的鹽埕老街，小吃店透出暖色燈光" style="width:100%;height:clamp(280px,42vw,560px);object-fit:cover;object-position:center 60%">
+  <section aria-label="主視覺" class="hero">
+    <img src="assets/img/hero.jpg" alt="黃昏時的鹽埕老街，小吃店透出暖色燈光">
+    <div class="hero-inner">
+      <div class="cols">
+        <div class="col">
+          <h2 class="h-col">ABOUT</h2>
+          <p>收錄中山大學附近鹽埕區、鼓山區的餐廳，部分店家可以直接線上訂位。</p>
+        </div>
+        <div class="col">
+          <h2 class="h-col">INFORMATION</h2>
+          <ul class="bullets" id="summary"><li>載入中…</li></ul>
+        </div>
+      </div>
+    </div>
   </section>
 
   <section class="wrap" style="padding-top:72px;padding-bottom:24px;text-align:center">
@@ -46,19 +58,6 @@
         <span style="font-size:14px;color:var(--muted);align-self:flex-start;padding-top:10px">標籤</span>
         <div id="tag-buttons" style="display:flex;flex-wrap:wrap;gap:10px;flex:1 1 400px"></div>
         <label class="check"><input type="checkbox" id="accept-res">只看可線上訂位</label>
-      </div>
-    </div>
-  </section>
-
-  <section class="wrap" style="padding-bottom:88px">
-    <div class="cols">
-      <div class="col">
-        <h2 class="h-col" style="margin-bottom:22px">ABOUT</h2>
-        <p style="margin:0;font-size:16px;line-height:2.1;color:var(--body)">收錄中山大學附近鹽埕區、鼓山區的餐廳，部分店家可以直接線上訂位。</p>
-      </div>
-      <div class="col">
-        <h2 class="h-col" style="margin-bottom:22px">INFORMATION</h2>
-        <ul class="bullets" id="summary"><li>載入中…</li></ul>
       </div>
     </div>
   </section>
