@@ -1,7 +1,7 @@
 # Render 部署設定（New → Blueprint 選這個 repo 就會照這份設定建立後端）
 services:
   - type: web
-    name: siwan-table-api
+    name: restaurant-reservation-api
     runtime: python
     region: singapore
     plan: free
