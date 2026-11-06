@@ -1,5 +1,5 @@
-import { api, esc, priceHtml, $ } from '../api.js?v=20261107b';
-import { renderLayout } from '../layout.js?v=20261107b';
+import { api, esc, priceHtml, $ } from '../api.js?v=20261107c';
+import { renderLayout } from '../layout.js?v=20261107c';
 
 renderLayout('home');
 

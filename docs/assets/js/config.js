@@ -16,3 +16,19 @@
   } catch (e) { /* 無法使用 localStorage 時改用預設值 */ }
   window.API_BASE_URL = onPages ? (saved || DEFAULT_API) : '';
 })();
+
+// 需要登入的頁面（<html data-auth="user|admin">）：在畫面顯示前就先檢查，
+// 沒登入直接換到登入頁，避免頁面先閃一下才跳轉。
+(function () {
+  var need = document.documentElement.getAttribute('data-auth');
+  if (!need) return;
+  var token = null, user = null;
+  try { token = localStorage.getItem('gs_token'); user = JSON.parse(localStorage.getItem('gs_user') || 'null'); } catch (e) {}
+  if (!token || !user) {
+    location.replace('login.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search));
+    document.documentElement.style.visibility = 'hidden';
+  } else if (need === 'admin' && user.role !== 'admin') {
+    location.replace('index.html');
+    document.documentElement.style.visibility = 'hidden';
+  }
+})();

@@ -1,5 +1,5 @@
-import { api, auth, esc, priceHtml, stars, showMsg, today, toast, $ } from '../api.js?v=20261107b';
-import { renderLayout } from '../layout.js?v=20261107b';
+import { api, auth, esc, priceHtml, stars, showMsg, today, toast, $ } from '../api.js?v=20261107c';
+import { renderLayout } from '../layout.js?v=20261107c';
 
 renderLayout('home');
 

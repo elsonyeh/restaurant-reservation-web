@@ -92,11 +92,11 @@ export function showMsg(el, text, ok = false) {
 export function requireLogin({ admin = false } = {}) {
   const u = auth.user;
   if (!u || !auth.token) {
-    location.href = 'login.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search);
+    location.replace('login.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search));
     return null;
   }
   if (admin && u.role !== 'admin') {
-    location.href = 'index.html';
+    location.replace('index.html');
     return null;
   }
   return u;

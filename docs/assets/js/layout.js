@@ -1,5 +1,5 @@
 // 每一頁共用的頁首與頁尾
-import { auth, esc } from './api.js?v=20261107b';
+import { auth, esc } from './api.js?v=20261107c';
 
 const USER_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>';
 
@@ -21,7 +21,7 @@ export function renderLayout(active) {
         <span class="l1">SAVED SEAT</span><span class="l2">RESERVE · 留席</span>
       </a>
       <nav class="main-nav" aria-label="主選單">
-        ${nav.map(([href, label, key]) => `<a href="${href}"${key === active ? ' aria-current="page"' : ''}>${label}</a>`).join('')}
+        ${nav.map(([href, label, key]) => `<a href="${!u && key !== 'home' ? 'login.html?next=' + href : href}"${key === active ? ' aria-current="page"' : ''}>${label}</a>`).join('')}
       </nav>
       <div class="header-actions">
         ${u
