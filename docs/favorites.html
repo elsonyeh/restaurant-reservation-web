@@ -21,7 +21,7 @@
       <ul id="lists" style="margin:0;padding:0;list-style:none"></ul>
       <form id="new-form" class="form" style="gap:14px;border-top:1px solid var(--line);padding-top:24px">
         <p style="margin:0;font-size:17px;font-weight:500" id="form-title">新增清單</p>
-        <label class="field">清單名稱<input type="text" name="fName" required maxlength="50" placeholder="例如：期末考後慶功"></label>
+        <label class="field">清單名稱<input type="text" name="fName" required maxlength="50" placeholder="例如：聚餐名單"></label>
         <label class="field">說明（選填）<input type="text" name="description" maxlength="200"></label>
         <label class="check"><input type="checkbox" name="isPublic">公開這份清單</label>
         <p class="msg err" id="new-msg" hidden></p>
@@ -82,7 +82,7 @@
             <button type="button" class="link-btn quiet" data-remove="${esc(r.rid)}">移出清單</button>
           </li>`).join('') || '<li class="empty">清單裡還沒有餐廳。</li>'}
         </ul>
-        <a href="index.html" style="display:inline-flex;margin-top:28px;font-size:15px;color:var(--rose-dark);border-bottom:1px solid var(--rose);padding:8px 0">去探索更多餐廳</a>`;
+        <a href="index.html" style="display:inline-flex;margin-top:28px;font-size:15px;color:var(--rose-dark);border-bottom:1px solid var(--rose);padding:8px 0">去找餐廳</a>`;
     }
 
     function resetForm() {

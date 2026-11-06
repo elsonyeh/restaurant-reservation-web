@@ -32,7 +32,7 @@ async function loadList() {
   list.innerHTML = '<li class="loading">載入中…</li>';
   const slow = setTimeout(() => {
     const el = list.querySelector('.loading');
-    if (el) el.textContent = '第一次開啟需要稍等一下，資料載入中…';
+    if (el) el.textContent = '載入中…';
   }, 4000);
   try {
     const data = await api('/restaurants', {
@@ -43,7 +43,7 @@ async function loadList() {
     });
     $('#result-meta').textContent = `共 ${data.total} 家`;
     if (!data.items.length) {
-      list.innerHTML = '<li class="empty">找不到符合條件的餐廳，試著減少篩選條件。</li>';
+      list.innerHTML = '<li class="empty">沒有符合條件的餐廳。</li>';
     } else {
       const start = (data.page - 1) * data.pageSize;
       list.innerHTML = data.items.map((r, i) => `

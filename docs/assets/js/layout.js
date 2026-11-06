@@ -6,7 +6,7 @@ const USER_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" s
 export function renderLayout(active) {
   const u = auth.user;
   const nav = [
-    ['index.html', '探索餐廳', 'home'],
+    ['index.html', '找餐廳', 'home'],
     ['reservations.html', '我的預約', 'reservations'],
     ['favorites.html', '我的收藏', 'favorites'],
     ['member.html', '會員中心', 'member']

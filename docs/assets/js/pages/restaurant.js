@@ -9,11 +9,11 @@ let rest = null;
 let selectedSlot = null;
 
 async function load() {
-  if (!rid) { main.innerHTML = '<p class="empty">找不到這家餐廳。<a href="index.html">回到探索餐廳</a></p>'; return; }
+  if (!rid) { main.innerHTML = '<p class="empty">找不到這家餐廳。<a href="index.html">回餐廳列表</a></p>'; return; }
   try {
     rest = await api('/restaurants/' + encodeURIComponent(rid));
   } catch (e) {
-    main.innerHTML = `<p class="empty">${esc(e.message)}　<a href="index.html">回到探索餐廳</a></p>`;
+    main.innerHTML = `<p class="empty">${esc(e.message)}　<a href="index.html">回餐廳列表</a></p>`;
     return;
   }
   document.title = `${rest.rname}｜留席 SAVED SEAT`;
@@ -42,7 +42,7 @@ function render() {
   main.innerHTML = `
   <div class="wrap" style="padding-top:28px">
     <nav aria-label="麵包屑" class="small" style="display:flex;flex-wrap:wrap;gap:8px">
-      <a href="index.html" style="color:var(--faint)">探索餐廳</a><span aria-hidden="true">/</span><span>${esc(r.district)}</span><span aria-hidden="true">/</span><span style="color:var(--ink)">${esc(r.rname)}</span>
+      <a href="index.html" style="color:var(--faint)">餐廳列表</a><span aria-hidden="true">/</span><span>${esc(r.district)}</span><span aria-hidden="true">/</span><span style="color:var(--ink)">${esc(r.rname)}</span>
     </nav>
     <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px 40px;padding:40px 0 36px">
       <div style="display:flex;flex-direction:column;gap:14px;flex:1 1 480px;min-width:0">
@@ -124,7 +124,7 @@ function render() {
         <p class="msg err" id="res-msg" hidden></p>
         <div class="row" style="align-items:center">
           <button type="submit" class="btn" style="letter-spacing:.2em">送出預約</button>
-          <span class="small">送出後可在「我的預約」查看狀態</span>
+          
         </div>
       </form>
       <aside aria-label="預約說明" style="flex:1 1 260px;border-left:1px solid var(--line-strong);padding-left:40px">
@@ -133,8 +133,8 @@ function render() {
         <p style="margin:6px 0 22px;font-size:15px;color:var(--body)" id="sel-seats"></p>
         <ul class="bullets" style="font-size:14px;gap:12px">
           <li>額滿或已過的時段無法選擇</li>
-          <li>預約送出後由店家確認，結果會顯示在「我的預約」</li>
-          <li>行程有變請提早取消</li>
+          <li>店家確認後，可在「我的預約」查看</li>
+          <li>無法前往請提早取消</li>
         </ul>
       </aside>
     </div>
@@ -176,7 +176,7 @@ function render() {
           </div>
           ${stars(v.rating)}
           ${v.comment ? `<p style="margin:0;font-size:16px;line-height:2;color:var(--body);white-space:pre-line">${esc(v.comment)}</p>` : ''}
-        </li>`).join('') : '<li class="empty" style="padding-top:0">還沒有會員評論，來當第一個吧。</li>'}
+        </li>`).join('') : '<li class="empty" style="padding-top:0">目前還沒有評論。</li>'}
       </ol>
     </div>
   </section>`;
