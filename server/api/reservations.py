@@ -36,7 +36,7 @@ def check_and_lock(cur, rid, dt, size, exclude_res_id=None):
     )
     left = rest["capacity"] - cur.fetchone()["booked"]
     if size > left:
-        raise ApiError(409, f"這個時段只剩 {max(left, 0)} 個座位" if left > 0 else "這個時段已經客滿")
+        raise ApiError(409, "這個時段座位不足，請改選其他時段" if left > 0 else "這個時段已經客滿，請改選其他時段")
     return rest
 
 

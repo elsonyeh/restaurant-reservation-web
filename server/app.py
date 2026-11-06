@@ -1,4 +1,4 @@
-"""SIWAN RESERVE 西灣好位：校園周邊餐廳評價與搜尋系統（Flask 後端）
+"""好位 GOOD SEAT：校園周邊餐廳評價與搜尋系統（Flask 後端）
 
 執行：python app.py
 本機執行時，http://127.0.0.1:5000 同時提供前端頁面（docs 資料夾）與 API（/api/...）。
@@ -101,5 +101,5 @@ app = create_app()
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
-    print(f"SIWAN RESERVE 已啟動：http://127.0.0.1:{port}")
+    print(f"好位 GOOD SEAT 已啟動：http://127.0.0.1:{port}")
     app.run(host="127.0.0.1", port=port, debug=False)

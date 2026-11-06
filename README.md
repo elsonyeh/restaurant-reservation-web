@@ -1,4 +1,4 @@
-# SIWAN RESERVE 西灣好位
+# 好位 GOOD SEAT
 
 資料庫系統 專案一（第 8 組）：中山大學周邊（鹽埕區、鼓山區）餐廳評價、搜尋與線上預約系統。
 
@@ -26,7 +26,7 @@ PostgreSQL（課程資料庫 140.117.68.35，資料庫 project_8）
 ## 資料夾
 
 ```
-siwan-table/
+restaurant-reservation-web/
 ├── docs/                    前端（GitHub Pages 會發布這個資料夾）
 │   ├── index.html           首頁／搜尋
 │   ├── restaurant.html      餐廳詳細頁（招牌菜、預約、評論）
@@ -50,7 +50,7 @@ siwan-table/
 ## 在自己電腦執行（Mac）
 
 ```bash
-cd siwan-table/server
+cd restaurant-reservation-web/server
 conda activate db-2026            # 或任何 Python 3.10 以上的環境
 pip install -r requirements.txt
 cp .env.example .env              # 打開 .env，在 DB_PASSWORD= 後面填入助教給的密碼
@@ -86,13 +86,13 @@ python app.py
 
 ### 前端：GitHub Pages
 
-1. 把整個 `siwan-table` 推到 GitHub（`.env` 已被 `.gitignore` 排除，密碼不會上傳）。
+1. 把整個專案推到 GitHub（`.env` 已被 `.gitignore` 排除，密碼不會上傳）。
 2. GitHub 專案 → Settings → Pages → Branch 選 `main`、資料夾選 `/docs` → Save。
-3. 幾分鐘後網址會是 `https://你的帳號.github.io/siwan-table/`。
+3. 幾分鐘後網址會是 `https://你的帳號.github.io/restaurant-reservation-web/`。
 
 ### 後端：需要一台能連到課程資料庫的主機
 
-GitHub Pages 只放靜態檔案，不能執行 Python，也不能直接連 PostgreSQL，所以後端要另外執行，再把它的網址填進 `docs/assets/js/config.js` 的 `SIWAN_API_BASE`。
+GitHub Pages 只放靜態檔案，不能執行 Python，也不能直接連 PostgreSQL，所以後端要另外執行，再把它的網址填進 `docs/assets/js/config.js` 的 `API_BASE_URL`。
 
 - **做法 A：Render（免費，網址固定，建議）**：專案根目錄已有 `render.yaml`。在 Render 選 New → Blueprint → 選這個 repo，只要填入 `DB_PASSWORD` 就會自動建立後端。完成後把 `https://…onrender.com` 填進 `docs/assets/js/config.js` 的 `DEFAULT_API`。免費方案閒置 15 分鐘會休眠，第一次開啟要等約 30 秒。前提是課程資料庫允許校外主機連線。
 前端網址設定：後端網址填在 `docs/assets/js/config.js` 的 `DEFAULT_API`。
@@ -105,7 +105,7 @@ GitHub Pages 只放靜態檔案，不能執行 Python，也不能直接連 Postg
 ## 測試帳號
 
 - 課程資料庫：沿用組員建立的測試帳號（例如 `test01@example.com` 為管理者）。這些帳號的密碼是明碼，系統相容；新註冊的帳號則以雜湊儲存。
-- 本機測試資料庫（`python db/init_local_db.py` 建立）：`admin@siwan.test / admin1234`（管理者）、`yijun@siwan.test / user1234`（會員）。
+- 本機測試資料庫（`python db/init_local_db.py` 建立）：`admin@goodseat.test / admin1234`（管理者）、`yijun@goodseat.test / user1234`（會員）。
 
 ## 資料來源
 

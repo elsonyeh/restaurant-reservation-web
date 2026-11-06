@@ -9,10 +9,10 @@
   var saved = null;
   try {
     if (fromUrl !== null) {
-      if (/^https:\/\/[\w.-]+(:\d+)?\/?$/.test(fromUrl)) localStorage.setItem('siwan_api', fromUrl.replace(/\/$/, ''));
-      else if (fromUrl === '') localStorage.removeItem('siwan_api');
+      if (/^https:\/\/[\w.-]+(:\d+)?\/?$/.test(fromUrl)) localStorage.setItem('gs_api', fromUrl.replace(/\/$/, ''));
+      else if (fromUrl === '') localStorage.removeItem('gs_api');
     }
-    saved = localStorage.getItem('siwan_api');
+    saved = localStorage.getItem('gs_api');
   } catch (e) { /* 無法使用 localStorage 時改用預設值 */ }
-  window.SIWAN_API_BASE = onPages ? (saved || DEFAULT_API) : '';
+  window.API_BASE_URL = onPages ? (saved || DEFAULT_API) : '';
 })();

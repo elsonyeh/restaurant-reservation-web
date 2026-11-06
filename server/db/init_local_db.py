@@ -72,10 +72,10 @@ def main():
             cur.execute("INSERT INTO hastag (tid, rid) VALUES (%s, %s)", (tag_id[t], rid))
 
     members = [
-        ("admin@siwan.test", "系統管理者", None, None, "admin1234", "admin"),
-        ("yijun@siwan.test", "陳怡君", "2004-05-12", "0912-345-678", "user1234", "user"),
-        ("bohan@siwan.test", "林柏翰", "2003-11-02", "0922-111-222", "user1234", "user"),
-        ("amy@siwan.test", "Amy", "2004-02-20", None, "user1234", "user"),
+        ("admin@goodseat.test", "系統管理者", None, None, "admin1234", "admin"),
+        ("yijun@goodseat.test", "陳怡君", "2004-05-12", "0912-345-678", "user1234", "user"),
+        ("bohan@goodseat.test", "林柏翰", "2003-11-02", "0922-111-222", "user1234", "user"),
+        ("amy@goodseat.test", "Amy", "2004-02-20", None, "user1234", "user"),
     ]
     mid = {}
     for email, name, bday, phone, pw, role in members:
@@ -92,33 +92,33 @@ def main():
             cur.execute("INSERT INTO topmenu VALUES (%s, %s, %s, %s)", (rest_id[rest], name, price, "示範資料"))
 
     for email, rest, rating, d, text in [
-        ("yijun@siwan.test", "泰法客泰味小食光", 5, -9, "打拋豬辣度剛好，飯量很夠。平日晚上六點多到還有位子，但七點後就開始排隊，建議先訂位。"),
-        ("bohan@siwan.test", "泰法客泰味小食光", 5, -18, "月亮蝦餅現炸，外皮很脆。四個人點了五道菜，平均下來一人兩百多。"),
-        ("amy@siwan.test", "泰法客泰味小食光", 4, -32, "味道道地，店內空間比較小，週末人多時聊天要稍微大聲一點。"),
-        ("yijun@siwan.test", "鹽埕町冰果室", 4, -26, "日式老屋很好拍，冰的份量兩個人吃剛好。假日下午要等大約二十分鐘。"),
-        ("yijun@siwan.test", "小豆町食堂", 5, -37, "離學校近，定食附湯和小菜，平日中午很適合一個人來。"),
-        ("bohan@siwan.test", "叻沙郎", 5, -12, "叻沙湯頭很濃，可以選辣度，價格對學生很友善。"),
+        ("yijun@goodseat.test", "泰法客泰味小食光", 5, -9, "打拋豬辣度剛好，飯量很夠。平日晚上六點多到還有位子，但七點後就開始排隊，建議先訂位。"),
+        ("bohan@goodseat.test", "泰法客泰味小食光", 5, -18, "月亮蝦餅現炸，外皮很脆。四個人點了五道菜，平均下來一人兩百多。"),
+        ("amy@goodseat.test", "泰法客泰味小食光", 4, -32, "味道道地，店內空間比較小，週末人多時聊天要稍微大聲一點。"),
+        ("yijun@goodseat.test", "鹽埕町冰果室", 4, -26, "日式老屋很好拍，冰的份量兩個人吃剛好。假日下午要等大約二十分鐘。"),
+        ("yijun@goodseat.test", "小豆町食堂", 5, -37, "離學校近，定食附湯和小菜，平日中午很適合一個人來。"),
+        ("bohan@goodseat.test", "叻沙郎", 5, -12, "叻沙湯頭很濃，可以選辣度，價格對學生很友善。"),
     ]:
         cur.execute("INSERT INTO review VALUES (%s, %s, %s, %s, %s, %s, %s)",
                     (hid("V"), rating, at(d + 1, 21, 0), at(d, 12, 0).date(), text, mid[email], rest_id[rest]))
 
     for email, rest, when, size, status, note in [
-        ("yijun@siwan.test", "泰法客泰味小食光", at(8, 18, 0), 2, "pending", "一位不吃辣"),
-        ("yijun@siwan.test", "都瓦哩印度廚房", at(15, 12, 0), 4, "confirmed", None),
-        ("yijun@siwan.test", "泰法客泰味小食光", at(-9, 18, 30), 2, "completed", None),
-        ("yijun@siwan.test", "鸚鵡螺餐酒館", at(-20, 19, 0), 3, "cancelled", "生日聚餐"),
-        ("bohan@siwan.test", "都瓦哩印度廚房", at(9, 12, 0), 4, "pending", None),
-        ("amy@siwan.test", "點22 港式點心專賣店", at(9, 13, 0), 3, "pending", None),
-        ("amy@siwan.test", "叻沙郎", at(5, 12, 0), 2, "rejected", "不接受預約"),
-        ("bohan@siwan.test", "泰法客泰味小食光", at(8, 18, 30), 4, "confirmed", "社團聚餐"),
+        ("yijun@goodseat.test", "泰法客泰味小食光", at(8, 18, 0), 2, "pending", "一位不吃辣"),
+        ("yijun@goodseat.test", "都瓦哩印度廚房", at(15, 12, 0), 4, "confirmed", None),
+        ("yijun@goodseat.test", "泰法客泰味小食光", at(-9, 18, 30), 2, "completed", None),
+        ("yijun@goodseat.test", "鸚鵡螺餐酒館", at(-20, 19, 0), 3, "cancelled", "生日聚餐"),
+        ("bohan@goodseat.test", "都瓦哩印度廚房", at(9, 12, 0), 4, "pending", None),
+        ("amy@goodseat.test", "點22 港式點心專賣店", at(9, 13, 0), 3, "pending", None),
+        ("amy@goodseat.test", "叻沙郎", at(5, 12, 0), 2, "rejected", "不接受預約"),
+        ("bohan@goodseat.test", "泰法客泰味小食光", at(8, 18, 30), 4, "confirmed", "社團聚餐"),
     ]:
         cur.execute("INSERT INTO reserve VALUES (%s, %s, %s, %s, %s, %s, %s)",
                     (hid("S"), status, note, when, size, mid[email], rest_id[rest]))
 
     for email, name, public, desc, rests in [
-        ("yijun@siwan.test", "想吃的店", False, "預設清單", ["叻沙郎", "食鍋者正宗南洋風味館", "HATA 烏克蘭廚房", "千義PASTA"]),
-        ("yijun@siwan.test", "宵夜", True, "晚上十點後還能去的店", ["呆呆滷味", "鹽埕波臭豆腐"]),
-        ("yijun@siwan.test", "帶家人來", False, "可以訂位、座位寬一點", ["都瓦哩印度廚房", "點22 港式點心專賣店", "壹捌迷你土雞鍋"]),
+        ("yijun@goodseat.test", "想吃的店", False, "預設清單", ["叻沙郎", "食鍋者正宗南洋風味館", "HATA 烏克蘭廚房", "千義PASTA"]),
+        ("yijun@goodseat.test", "宵夜", True, "晚上十點後還能去的店", ["呆呆滷味", "鹽埕波臭豆腐"]),
+        ("yijun@goodseat.test", "帶家人來", False, "可以訂位、座位寬一點", ["都瓦哩印度廚房", "點22 港式點心專賣店", "壹捌迷你土雞鍋"]),
     ]:
         fid = hid("F")
         cur.execute("INSERT INTO favlist VALUES (%s, %s, %s, %s, %s)", (fid, name, public, desc, mid[email]))
@@ -129,7 +129,7 @@ def main():
     conn.commit()
     conn.close()
     print(f"本機資料庫完成：餐廳 {len(restaurants)} 家、標籤 {len(tag_id)} 個、會員 {len(members)} 位")
-    print("測試帳號：admin@siwan.test / admin1234（管理者），yijun@siwan.test / user1234（會員）")
+    print("測試帳號：admin@goodseat.test / admin1234（管理者），yijun@goodseat.test / user1234（會員）")
 
 
 if __name__ == "__main__":

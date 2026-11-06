@@ -117,7 +117,7 @@ def availability(rid):
     """某一天各時段的剩餘座位 = 座位數 − 前後 2 小時內有效預約（待確認、已確認）的人數總和。"""
     day = parse_date(request.args.get("date"))
     if not day:
-        raise ApiError(400, "請提供日期")
+        raise ApiError(400, "請選擇日期")
     rest = db.fetch_one("SELECT acceptRes, capacity, maxPartySize FROM Restaurant WHERE rId = %s", (rid,))
     if not rest:
         raise ApiError(404, "找不到這家餐廳")

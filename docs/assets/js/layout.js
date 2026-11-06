@@ -17,8 +17,8 @@ export function renderLayout(active) {
   header.className = 'site-header';
   header.innerHTML = `
     <div class="wrap-wide">
-      <a href="index.html" class="logo" aria-label="SIWAN RESERVE 西灣好位 首頁">
-        <span class="l1">SIWAN</span><span class="l2">RESERVE · 西灣好位</span>
+      <a href="index.html" class="logo" aria-label="好位 GOOD SEAT 首頁">
+        <span class="l1">GOOD SEAT</span><span class="l2">RESERVE · 好位</span>
       </a>
       <nav class="main-nav" aria-label="主選單">
         ${nav.map(([href, label, key]) => `<a href="${href}"${key === active ? ' aria-current="page"' : ''}>${label}</a>`).join('')}
@@ -39,8 +39,8 @@ export function renderLayout(active) {
   footer.className = 'site-footer';
   footer.innerHTML = `
     <div class="wrap">
-      <a href="index.html" class="logo" aria-label="回首頁"><span class="l1" style="font-size:24px">SIWAN</span><span class="l2">RESERVE · 西灣好位</span></a>
-      <p class="small" style="margin:0;line-height:1.8">中山大學周邊餐廳訂位與評價<br>© 2026 SIWAN RESERVE 西灣好位</p>
+      <a href="index.html" class="logo" aria-label="回首頁"><span class="l1" style="font-size:24px">GOOD SEAT</span><span class="l2">RESERVE · 好位</span></a>
+      <p class="small" style="margin:0;line-height:1.8">中山大學周邊餐廳訂位與評價<br>© 2026 好位 GOOD SEAT</p>
     </div>`;
   document.body.appendChild(footer);
 }

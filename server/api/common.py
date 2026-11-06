@@ -25,21 +25,21 @@ def new_id(cur, table, column):
         )
         n = cur.fetchone()["n"]
         if n > 99999:
-            raise ApiError(500, "編號已用完")
+            raise ApiError(500, "系統忙碌中，請稍後再試")
         return f"{prefix}{n:05d}"
     for _ in range(20):
         candidate = secrets.token_hex(3)
         cur.execute(f"SELECT 1 FROM {table} WHERE {column} = %s", (candidate,))
         if not cur.fetchone():
             return candidate
-    raise ApiError(500, "無法產生新的編號，請再試一次")
+    raise ApiError(500, "系統忙碌中，請稍後再試")
 
 
 def clean_id(value, label="編號"):
     """檢查從網址或表單傳來的編號格式。"""
     value = (str(value).strip() if value is not None else "")
     if not ID_RE.match(value):
-        raise ApiError(400, f"{label}格式錯誤")
+        raise ApiError(404, "找不到這筆資料")
     return value
 
 
@@ -75,7 +75,7 @@ def parse_date(value):
         return None
     if isinstance(value, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value.strip()):
         return value.strip()
-    raise ApiError(400, "日期格式應為 YYYY-MM-DD")
+    raise ApiError(400, "日期格式不正確")
 
 
 # 資料表沒有區域欄位，由地址判斷行政區

@@ -1,16 +1,16 @@
 // 呼叫後端 API、管理登入狀態、共用的小工具
-const API_BASE = (window.SIWAN_API_BASE || '').replace(/\/$/, '');
+const API_BASE = (window.API_BASE_URL || '').replace(/\/$/, '');
 
 export const auth = {
-  get token() { try { return localStorage.getItem('siwan_token'); } catch { return null; } },
-  get user() { try { return JSON.parse(localStorage.getItem('siwan_user') || 'null'); } catch { return null; } },
+  get token() { try { return localStorage.getItem('gs_token'); } catch { return null; } },
+  get user() { try { return JSON.parse(localStorage.getItem('gs_user') || 'null'); } catch { return null; } },
   save(token, member) {
     try {
-      localStorage.setItem('siwan_token', token);
-      localStorage.setItem('siwan_user', JSON.stringify(member));
+      localStorage.setItem('gs_token', token);
+      localStorage.setItem('gs_user', JSON.stringify(member));
     } catch { /* 無痕模式等情況無法儲存 */ }
   },
-  clear() { try { localStorage.removeItem('siwan_token'); localStorage.removeItem('siwan_user'); } catch {} }
+  clear() { try { localStorage.removeItem('gs_token'); localStorage.removeItem('gs_user'); } catch {} }
 };
 
 export async function api(path, { method = 'GET', body, query } = {}) {

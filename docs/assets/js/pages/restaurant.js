@@ -9,14 +9,14 @@ let rest = null;
 let selectedSlot = null;
 
 async function load() {
-  if (!rid) { main.innerHTML = '<p class="empty">缺少餐廳編號。<a href="index.html">回到探索餐廳</a></p>'; return; }
+  if (!rid) { main.innerHTML = '<p class="empty">找不到這家餐廳。<a href="index.html">回到探索餐廳</a></p>'; return; }
   try {
     rest = await api('/restaurants/' + encodeURIComponent(rid));
   } catch (e) {
     main.innerHTML = `<p class="empty">${esc(e.message)}　<a href="index.html">回到探索餐廳</a></p>`;
     return;
   }
-  document.title = `${rest.rname}｜SIWAN RESERVE 西灣好位`;
+  document.title = `${rest.rname}｜好位 GOOD SEAT`;
   render();
   if (rest.acceptres) loadSlots();
 }
