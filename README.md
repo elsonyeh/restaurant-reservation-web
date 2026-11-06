@@ -99,6 +99,11 @@ GitHub Pages 只放靜態檔案，不能執行 Python，也不能直接連 Postg
 
 前端網址設定：打開 `https://elsonyeh.github.io/restaurant-reservation-web/?api=後端網址`，瀏覽器會記住後端網址；固定網址也可以直接填在 `docs/assets/js/config.js` 的 `DEFAULT_API`。
 
+## 目前的網址
+
+- 網站（GitHub Pages）：https://elsonyeh.github.io/restaurant-reservation-web/
+- 後端 API（Render）：https://restaurant-reservation-api-5i11.onrender.com （免費方案閒置會休眠，第一次開啟約需 50 秒）
+
 ## 測試帳號
 
 - 課程資料庫：沿用組員建立的測試帳號（例如 `test01@example.com` 為管理者）。這些帳號的密碼是明碼，系統相容；新註冊的帳號則以雜湊儲存。

@@ -5,7 +5,7 @@
 //   https://elsonyeh.github.io/restaurant-reservation-web/?api=https://xxxx.trycloudflare.com
 //   瀏覽器會記住這個設定。若後端有固定網址（例如 Render），直接填在下面的 DEFAULT_API。
 (function () {
-  var DEFAULT_API = '';
+  var DEFAULT_API = 'https://restaurant-reservation-api-5i11.onrender.com';
   var onPages = /\.github\.io$/.test(location.hostname);
   var fromUrl = new URLSearchParams(location.search).get('api');
   var saved = null;
