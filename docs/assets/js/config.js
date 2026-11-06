@@ -1,4 +1,20 @@
 // 後端 API 的網址。
-// - 本機執行（python app.py 後開 http://127.0.0.1:5000）：留空即可，前後端同一個網址。
-// - 放到 GitHub Pages：改成後端實際的網址，例如 'https://xxxx.trycloudflare.com'（結尾不要加 /）。
-window.SIWAN_API_BASE = '';
+// - 本機執行（python app.py 後開 http://127.0.0.1:5050）：前後端同一個網址，不用設定。
+// - GitHub Pages：後端網址會變動（例如 Cloudflare Tunnel 每次啟動都不同），
+//   所以第一次打開時在網址後面加上 ?api=後端網址，例如
+//   https://elsonyeh.github.io/restaurant-reservation-web/?api=https://xxxx.trycloudflare.com
+//   瀏覽器會記住這個設定。若後端有固定網址（例如 Render），直接填在下面的 DEFAULT_API。
+(function () {
+  var DEFAULT_API = '';
+  var onPages = /\.github\.io$/.test(location.hostname);
+  var fromUrl = new URLSearchParams(location.search).get('api');
+  var saved = null;
+  try {
+    if (fromUrl !== null) {
+      if (/^https:\/\/[\w.-]+(:\d+)?\/?$/.test(fromUrl)) localStorage.setItem('siwan_api', fromUrl.replace(/\/$/, ''));
+      else if (fromUrl === '') localStorage.removeItem('siwan_api');
+    }
+    saved = localStorage.getItem('siwan_api');
+  } catch (e) { /* 無法使用 localStorage 時改用預設值 */ }
+  window.SIWAN_API_BASE = onPages ? (saved || DEFAULT_API) : '';
+})();

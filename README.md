@@ -57,7 +57,7 @@ cp .env.example .env              # 打開 .env，在 DB_PASSWORD= 後面填入�
 python app.py
 ```
 
-打開 http://127.0.0.1:5000 。
+打開 http://127.0.0.1:5050 。（Mac 的 AirPlay 常佔用 5000，所以預設用 5050。）
 
 課程資料庫要在校內網路（或可連到 140.117.68.35 的網路）才連得到。
 
@@ -95,7 +95,9 @@ python app.py
 GitHub Pages 只放靜態檔案，不能執行 Python，也不能直接連 PostgreSQL，所以後端要另外執行，再把它的網址填進 `docs/assets/js/config.js` 的 `SIWAN_API_BASE`。
 
 - **做法 A：Render（免費，網址固定）**：New → Web Service，連結 GitHub 專案；Root Directory 填 `server`；Build Command `pip install -r requirements.txt`；Start Command `gunicorn app:app`；Environment 加入 `.env` 裡的各項設定，`CORS_ORIGINS` 加上你的 Pages 網址。前提是課程資料庫允許校外主機連線。
-- **做法 B：自己的電腦＋Cloudflare Tunnel（臨時展示）**：電腦執行 `python app.py` 後，另開終端機執行 `cloudflared tunnel --url http://127.0.0.1:5000`，會得到一個 `https://xxxx.trycloudflare.com` 網址；電腦和終端機要一直開著。
+- **做法 B：自己的電腦＋Cloudflare Tunnel（臨時展示，目前使用）**：在 `server` 資料夾執行 `./start_public.sh`，它會啟動後端並開一條 Cloudflare 通道，畫面上會印出可以直接分享的網址。電腦和終端機要一直開著；每次重新啟動網址都會變。
+
+前端網址設定：打開 `https://elsonyeh.github.io/restaurant-reservation-web/?api=後端網址`，瀏覽器會記住後端網址；固定網址也可以直接填在 `docs/assets/js/config.js` 的 `DEFAULT_API`。
 
 ## 測試帳號
 
