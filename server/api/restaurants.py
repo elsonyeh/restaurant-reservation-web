@@ -82,30 +82,31 @@ def list_restaurants():
 @bp.get("/restaurants/<rid>")
 def restaurant_detail(rid):
     rid = clean_id(rid, "餐廳編號")
+    # 一次查詢取回餐廳、標籤、招牌菜、評論與評分統計（減少和資料庫往返的次數）
     rest = db.fetch_one(
         f"""SELECT r.rId, r.rName, r.address, r.priceRange, r.maxPartySize, r.capacity, r.acceptRes,
-                   r.google_rate, r.google_num, {PICTURE_SQL} AS picture, {DISTRICT_SQL} AS district
+                   r.google_rate, r.google_num, {PICTURE_SQL} AS picture, {DISTRICT_SQL} AS district,
+                   (SELECT COALESCE(json_agg(t.tName ORDER BY t.tName), '[]')
+                      FROM HasTag ht JOIN Tag t ON t.tId = ht.tId WHERE ht.rId = r.rId) AS tags,
+                   (SELECT COALESCE(json_agg(json_build_object('menuname', m.menuName, 'price', m.price,
+                                                               'description', m.description) ORDER BY m.menuName), '[]')
+                      FROM TopMenu m WHERE m.rId = r.rId) AS menu,
+                   (SELECT COALESCE(json_agg(json_build_object(
+                              'revid', v.revId, 'rating', v.rating, 'comment', v.comment,
+                              'visitdate', to_char(v.visitDate, 'YYYY-MM-DD'),
+                              'reviewtime', to_char(v.reviewTime, 'YYYY-MM-DD HH24:MI'),
+                              'mid', v.mId, 'mname', COALESCE(mb.mName, '已刪除的會員'))
+                            ORDER BY v.reviewTime DESC NULLS LAST), '[]')
+                      FROM Review v LEFT JOIN Member mb ON mb.mId = v.mId WHERE v.rId = r.rId) AS reviews,
+                   (SELECT json_build_object('avg', ROUND(AVG(rating), 1), 'n', COUNT(*),
+                              's5', COUNT(*) FILTER (WHERE rating = 5), 's4', COUNT(*) FILTER (WHERE rating = 4),
+                              's3', COUNT(*) FILTER (WHERE rating = 3), 's2', COUNT(*) FILTER (WHERE rating = 2),
+                              's1', COUNT(*) FILTER (WHERE rating = 1))
+                      FROM Review WHERE rId = r.rId) AS review_summary
               FROM Restaurant r WHERE r.rId = %s""", (rid,)
     )
     if not rest:
         raise ApiError(404, "找不到這家餐廳")
-
-    rest["tags"] = [x["tname"] for x in db.fetch_all(
-        "SELECT t.tName FROM HasTag ht JOIN Tag t ON t.tId = ht.tId WHERE ht.rId = %s ORDER BY t.tName", (rid,))]
-    rest["menu"] = db.fetch_all(
-        "SELECT menuName, price, description FROM TopMenu WHERE rId = %s ORDER BY menuName", (rid,))
-    rest["reviews"] = db.fetch_all(
-        """SELECT v.revId, v.rating, v.comment, v.visitDate, v.reviewTime, v.mId,
-                  COALESCE(m.mName, '已刪除的會員') AS mName
-             FROM Review v LEFT JOIN Member m ON m.mId = v.mId
-            WHERE v.rId = %s ORDER BY v.reviewTime DESC NULLS LAST""", (rid,))
-    summary = db.fetch_one(
-        """SELECT ROUND(AVG(rating), 1) AS avg, COUNT(*) AS n,
-                  COUNT(*) FILTER (WHERE rating = 5) AS s5, COUNT(*) FILTER (WHERE rating = 4) AS s4,
-                  COUNT(*) FILTER (WHERE rating = 3) AS s3, COUNT(*) FILTER (WHERE rating = 2) AS s2,
-                  COUNT(*) FILTER (WHERE rating = 1) AS s1
-             FROM Review WHERE rId = %s""", (rid,))
-    rest["review_summary"] = summary
 
     # 登入時：附上這位會員的收藏清單（標示哪些已包含此餐廳）
     if g.user:
