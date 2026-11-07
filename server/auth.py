@@ -37,6 +37,8 @@ def load_user():
 def login_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
+        if request.method == "OPTIONS":  # 瀏覽器跨網域的預檢請求不帶 token，直接放行
+            return None
         if not g.user:
             return jsonify(error="請先登入"), 401
         return fn(*args, **kwargs)
@@ -46,6 +48,8 @@ def login_required(fn):
 def admin_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
+        if request.method == "OPTIONS":  # 瀏覽器跨網域的預檢請求不帶 token，直接放行
+            return None
         if not g.user:
             return jsonify(error="請先登入"), 401
         # 以資料庫目前的身分為準（身分被調整後，不必等舊的 token 過期）
