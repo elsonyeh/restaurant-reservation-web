@@ -54,9 +54,13 @@ def register():
 def login():
     data = body()
     email = (data.get("email") or "").strip().lower()
-    m = db.fetch_one("SELECT * FROM Member WHERE LOWER(email) = %s", (email,))
-    if not m or not password_ok(m["password"], data.get("password") or ""):
-        raise ApiError(401, "信箱或密碼錯誤")
+    if not email:
+        raise ApiError(400, "請輸入電子信箱")
+    m = db.fetch_one("SELECT * FROM Member WHERE LOWER(TRIM(email)) = %s", (email,))
+    if not m:
+        raise ApiError(400, "這個信箱還沒有註冊，請先建立帳號")
+    if not password_ok(m["password"], data.get("password") or ""):
+        raise ApiError(400, "密碼錯誤，請再試一次")
     member = {k: m[k] for k in ("mid", "email", "mname", "role")}
     return {"token": make_token(member), "member": member}
 
