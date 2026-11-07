@@ -1,5 +1,5 @@
-import { api, auth, esc, imgSrc, priceHtml, rate, stars, showMsg, today, toast, $ } from '../api.js?v=20261107m';
-import { renderLayout } from '../layout.js?v=20261107m';
+import { api, auth, esc, imgSrc, priceHtml, rate, stars, showMsg, today, toast, $ } from '../api.js?v=20261107n';
+import { renderLayout } from '../layout.js?v=20261107n';
 
 renderLayout('home');
 
@@ -73,7 +73,7 @@ function render() {
         <h2 class="h-col" style="margin-bottom:22px">INFORMATION</h2>
         <ul class="bullets">
           <li>${esc(r.address || '地址未提供')}</li>
-          <li>價位 ${'$'.repeat(Number(r.pricerange) || 0) || '—'}・建議 1–${r.maxpartysize || 4} 人用餐</li>
+          <li>價位 ${'$'.repeat(Number(r.pricerange) || 0) || '—'}（${({ 1: '平價', 2: '中價位', 3: '高價位' })[String(r.pricerange || '').trim()] || '未提供'}）</li>
           <li>${r.acceptres ? `可線上訂位・每筆最多 ${r.maxpartysize} 人` : '不提供線上訂位'}</li>
         </ul>
       </div>

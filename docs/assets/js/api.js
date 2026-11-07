@@ -13,6 +13,8 @@ export const auth = {
   clear() { try { localStorage.removeItem('gs_token'); localStorage.removeItem('gs_user'); } catch {} }
 };
 
+let slowNoticed = false;
+
 export async function api(path, { method = 'GET', body, query } = {}) {
   let url = API_BASE + '/api' + path;
   if (query) {
@@ -23,12 +25,16 @@ export async function api(path, { method = 'GET', body, query } = {}) {
   if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (auth.token) headers.Authorization = 'Bearer ' + auth.token;
 
+  // 連線超過 4 秒（例如主機剛被喚醒）時，提示一次請使用者稍候
+  const slow = setTimeout(() => { if (!slowNoticed) { slowNoticed = true; toast('資料準備中，第一次開啟可能需要半分鐘，請稍候'); } }, 4000);
   let res;
   try {
     res = await fetch(url, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined });
   } catch {
+    clearTimeout(slow);
     throw new Error('目前無法連線，請稍後再試');
   }
+  clearTimeout(slow);
   let data = null;
   try { data = await res.json(); } catch { /* 沒有內容 */ }
   if (res.status === 401 && auth.token) {
@@ -93,7 +99,7 @@ export function toast(text) {
   el.setAttribute('role', 'status');
   el.textContent = text;
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2600);
+  setTimeout(() => el.remove(), text.length > 20 ? 5000 : 2600);
 }
 
 export function showMsg(el, text, ok = false) {
