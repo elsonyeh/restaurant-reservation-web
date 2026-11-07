@@ -1,5 +1,5 @@
-import { api, auth, esc, priceHtml, rate, stars, showMsg, today, toast, $ } from '../api.js?v=20261107d';
-import { renderLayout } from '../layout.js?v=20261107d';
+import { api, auth, esc, imgSrc, priceHtml, rate, stars, showMsg, today, toast, $ } from '../api.js?v=20261107e';
+import { renderLayout } from '../layout.js?v=20261107e';
 
 renderLayout('home');
 
@@ -28,7 +28,7 @@ function render() {
   const myReview = user ? r.reviews.find((v) => (v.mid || '').trim() === (user.mid || '').trim()) : null;
 
   const picture = r.picture
-    ? `<img src="${esc(r.picture)}" alt="${esc(r.rname)} 的照片" style="width:100%;height:clamp(240px,36vw,480px);object-fit:cover">`
+    ? `<img src="${esc(imgSrc(r.picture))}" alt="${esc(r.rname)} 的照片" style="width:100%;height:clamp(240px,36vw,480px);object-fit:cover">`
     : `<div class="marble" style="height:clamp(200px,26vw,340px);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px">
          <span style="font-size:clamp(26px,4vw,40px);letter-spacing:.12em;color:var(--rose-dark)">${esc(r.rname)}</span>
        </div>`;

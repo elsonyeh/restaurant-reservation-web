@@ -1,8 +1,11 @@
 """餐廳：搜尋、篩選、詳細資料、標籤、預約時段的剩餘座位。"""
-from flask import Blueprint, g, request
+import base64
+import binascii
+
+from flask import Blueprint, Response, g, request
 
 import db
-from api.common import DINING_INTERVAL, DISTRICT_SQL, TIME_SLOTS, ApiError, clean_id, parse_date, to_int
+from api.common import DINING_INTERVAL, DISTRICT_SQL, PICTURE_SQL, TIME_SLOTS, ApiError, clean_id, parse_date, to_int
 
 bp = Blueprint("restaurants", __name__)
 
@@ -56,7 +59,7 @@ def list_restaurants():
 
     sql = f"""
         SELECT r.rId, r.rName, r.address, r.priceRange, r.acceptRes,
-               r.google_rate, r.google_num, r.picture,
+               r.google_rate, r.google_num, {PICTURE_SQL} AS picture,
                {DISTRICT_SQL} AS district,
                ROUND(AVG(v.rating), 1) AS member_rate,
                COUNT(v.revId) AS member_num,
@@ -80,7 +83,9 @@ def list_restaurants():
 def restaurant_detail(rid):
     rid = clean_id(rid, "餐廳編號")
     rest = db.fetch_one(
-        f"""SELECT r.*, {DISTRICT_SQL} AS district FROM Restaurant r WHERE r.rId = %s""", (rid,)
+        f"""SELECT r.rId, r.rName, r.address, r.priceRange, r.maxPartySize, r.capacity, r.acceptRes,
+                   r.google_rate, r.google_num, {PICTURE_SQL} AS picture, {DISTRICT_SQL} AS district
+              FROM Restaurant r WHERE r.rId = %s""", (rid,)
     )
     if not rest:
         raise ApiError(404, "找不到這家餐廳")
@@ -109,6 +114,24 @@ def restaurant_detail(rid):
                       EXISTS (SELECT 1 FROM Contains c WHERE c.fId = f.fId AND c.rId = %s) AS contains
                  FROM Favlist f WHERE f.mId = %s ORDER BY f.fId""", (rid, g.user["mid"]))
     return rest
+
+
+@bp.get("/restaurants/<rid>/picture")
+def picture(rid):
+    """輸出存在資料庫裡的餐廳照片。"""
+    rid = clean_id(rid, "餐廳編號")
+    row = db.fetch_one("SELECT picture FROM Restaurant WHERE rId = %s", (rid,))
+    pic = (row or {}).get("picture") or ""
+    if not pic.startswith("data:image/") or ";base64," not in pic:
+        raise ApiError(404, "找不到這張圖片")
+    head, data = pic.split(",", 1)
+    try:
+        raw = base64.b64decode(data)
+    except (binascii.Error, ValueError):
+        raise ApiError(404, "找不到這張圖片")
+    resp = Response(raw, mimetype=head[5:].split(";")[0])
+    resp.headers["Cache-Control"] = "public, max-age=604800, immutable"
+    return resp
 
 
 @bp.get("/restaurants/<rid>/availability")

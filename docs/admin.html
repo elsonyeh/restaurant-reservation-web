@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=20261107d">
-<script src="assets/js/config.js?v=20261107d"></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20261107e">
+<script src="assets/js/config.js?v=20261107e"></script>
 <style>
   .admin { display: flex; flex-wrap: wrap; flex: 1 1 auto; }
   .admin-nav { flex: 1 1 220px; border-right: 1px solid var(--line); padding: 32px 0; }
@@ -55,7 +55,14 @@
       <label class="field">總座位數<input name="capacity" type="number" min="1"></label>
       <label class="field">單筆人數上限<input name="maxPartySize" type="number" min="1" value="4"></label>
     </div>
-    <label class="field">照片網址（選填）<input name="picture" type="url" placeholder="https://..."></label>
+    <div class="field">餐廳照片（選填）
+      <input type="hidden" name="picture">
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <img id="pic-preview" alt="" hidden style="width:120px;height:80px;object-fit:cover;border:1px solid var(--line)">
+        <label class="btn btn-quiet" style="cursor:pointer">選擇圖片<input type="file" id="pic-file" accept="image/*" hidden></label>
+        <button type="button" class="link-btn quiet" id="pic-clear" hidden>移除圖片</button>
+      </div>
+    </div>
     <fieldset style="border:0;padding:0;margin:0"><legend style="font-size:14px;color:var(--muted);margin-bottom:8px">標籤</legend>
       <input type="search" id="tag-filter" placeholder="篩選標籤" style="margin-bottom:10px">
       <div id="tag-picks" style="display:flex;flex-wrap:wrap;gap:8px;max-height:180px;overflow:auto"></div>
@@ -86,6 +93,6 @@
   </form>
 </dialog>
 
-<script type="module" src="assets/js/pages/admin.js?v=20261107d"></script>
+<script type="module" src="assets/js/pages/admin.js?v=20261107e"></script>
 </body>
 </html>

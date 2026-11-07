@@ -91,3 +91,29 @@ TIME_SLOTS = ["11:30", "12:00", "12:30", "13:00", "17:30", "18:00", "18:30", "19
 
 STATUS_LABEL = {"pending": "待確認", "confirmed": "已確認", "rejected": "已拒絕", "cancelled": "已取消", "completed": "已完成"}
 STATUSES = tuple(STATUS_LABEL)
+
+
+# 餐廳照片：資料庫的 picture 欄位存「圖片網址」或「data:image/...;base64,...」（直接存進資料庫的圖片）。
+# 回傳給前端時，存在資料庫裡的圖片改成 /api/restaurants/<rid>/picture，避免列表一次傳一大串資料。
+PICTURE_SQL = """CASE WHEN r.picture LIKE 'data:%%' THEN '/api/restaurants/' || TRIM(r.rId) || '/picture?v=' || LEFT(MD5(r.picture), 8)
+                      ELSE NULLIF(TRIM(r.picture), '') END"""
+MAX_PICTURE_LEN = 2_000_000  # 約 1.5 MB 的圖片
+
+
+def clean_picture(value):
+    """檢查前端送來的圖片：空白＝沒有圖片；/api/... ＝沿用原本的圖片（回傳 KEEP）。"""
+    value = (value or "").strip()
+    if not value:
+        return None
+    if value.startswith("/api/"):
+        return KEEP
+    if value.startswith("data:image/"):
+        if len(value) > MAX_PICTURE_LEN:
+            raise ApiError(400, "圖片太大，請換一張較小的圖片")
+        return value
+    if re.match(r"^https?://", value):
+        return value
+    raise ApiError(400, "圖片格式不正確")
+
+
+KEEP = object()

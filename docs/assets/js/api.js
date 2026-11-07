@@ -54,6 +54,11 @@ export function priceHtml(p) {
   return `<span aria-label="${['', '平價', '中價位', '高價位'][n] || ''}">${'$'.repeat(n)}<i style="font-style:normal;color:#C9BDBA">${'$'.repeat(Math.max(3 - n, 0))}</i></span>`;
 }
 
+/** 圖片網址：存在資料庫裡的圖片由後端 /api/... 提供 */
+export function imgSrc(p) {
+  return p && p.startsWith('/api/') ? API_BASE + p : (p || '');
+}
+
 /** 評分統一顯示一位小數（5 → 5.0），沒有評分顯示 — */
 export function rate(x) {
   const n = Number(x);

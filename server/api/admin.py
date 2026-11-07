@@ -4,6 +4,7 @@ from flask import Blueprint, g, request
 import db
 from auth import admin_required
 from api.common import DISTRICT_SQL, STATUSES, ApiError, body, clean_id, new_id, to_int
+from api.common import KEEP, PICTURE_SQL, clean_picture
 
 bp = Blueprint("admin", __name__)
 
@@ -67,7 +68,7 @@ def _restaurant_fields(data):
     rate = float(rate) if rate not in (None, "") else None
     return (name, (data.get("address") or "").strip() or None, price,
             to_int(data.get("maxPartySize"), 4), capacity, accept, rate,
-            to_int(data.get("google_num")), (data.get("picture") or "").strip() or None)
+            to_int(data.get("google_num")), clean_picture(data.get("picture")))
 
 
 def _set_tags(cur, rid, tag_ids):
@@ -82,7 +83,7 @@ def list_restaurants():
     page = max(to_int(request.args.get("page"), 1), 1)
     rows = db.fetch_all(
         f"""SELECT r.rId, r.rName, r.address, r.priceRange, r.maxPartySize, r.capacity, r.acceptRes,
-                   r.google_rate, r.google_num, r.picture, {DISTRICT_SQL} AS district,
+                   r.google_rate, r.google_num, {PICTURE_SQL} AS picture, {DISTRICT_SQL} AS district,
                    (SELECT COALESCE(array_agg(ht.tId), '{{}}') FROM HasTag ht WHERE ht.rId = r.rId) AS tag_ids,
                    COUNT(*) OVER () AS total
               FROM Restaurant r
@@ -98,11 +99,14 @@ def create_restaurant():
     data = body()
     with db.transaction() as cur:
         rid = new_id(cur, "Restaurant", "rId")
+        fields = _restaurant_fields(data)
+        if fields[-1] is KEEP:
+            fields = fields[:-1] + (None,)
         cur.execute(
             """INSERT INTO Restaurant (rId, rName, address, priceRange, maxPartySize, capacity, acceptRes,
                                        google_rate, google_num, picture)
                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-            (rid,) + _restaurant_fields(data))
+            (rid,) + fields)
         _set_tags(cur, rid, data.get("tagIds"))
     return {"rid": rid}, 201
 
@@ -112,11 +116,14 @@ def update_restaurant(rid):
     rid = clean_id(rid)
     data = body()
     with db.transaction() as cur:
+        fields = _restaurant_fields(data)
+        keep = fields[-1] is KEEP  # 圖片沒有更換就沿用資料庫裡原本的
         cur.execute(
             """UPDATE Restaurant SET rName = %s, address = %s, priceRange = %s, maxPartySize = %s,
-                      capacity = %s, acceptRes = %s, google_rate = %s, google_num = %s, picture = %s
+                      capacity = %s, acceptRes = %s, google_rate = %s, google_num = %s,
+                      picture = CASE WHEN %s THEN picture ELSE %s END
                 WHERE rId = %s""",
-            _restaurant_fields(data) + (rid,))
+            fields[:-1] + (keep, None if keep else fields[-1], rid))
         if not cur.rowcount:
             raise ApiError(404, "找不到這家餐廳")
         if "tagIds" in data:

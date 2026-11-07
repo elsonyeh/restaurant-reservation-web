@@ -1,5 +1,5 @@
-import { api, esc, priceHtml, rate, showMsg, toast, requireLogin, splitDateTime, STATUS_LABEL, $, $$ } from '../api.js?v=20261107d';
-import { renderLayout } from '../layout.js?v=20261107d';
+import { api, esc, imgSrc, priceHtml, rate, showMsg, toast, requireLogin, splitDateTime, STATUS_LABEL, $, $$ } from '../api.js?v=20261107e';
+import { renderLayout } from '../layout.js?v=20261107e';
 
 const view = $('#view');
 let allTags = [];
@@ -195,12 +195,14 @@ async function openRest(r) {
   editingRest = r;
   $('#rest-h').textContent = r ? `編輯餐廳：${r.rname}` : '新增餐廳';
   rf.reset();
+  rf.picture.value = '';
   if (r) {
     rf.rName.value = r.rname; rf.address.value = r.address || ''; rf.priceRange.value = String(r.pricerange || '1').trim();
     rf.google_rate.value = r.google_rate ?? ''; rf.google_num.value = r.google_num ?? '';
     rf.acceptRes.checked = !!r.acceptres; rf.capacity.value = r.capacity ?? ''; rf.maxPartySize.value = r.maxpartysize ?? 4;
     rf.picture.value = r.picture || '';
   }
+  showPic();
   const selected = new Set((r?.tag_ids || []).map((x) => x.trim()));
   $('#tag-picks').innerHTML = allTags.map((t) => `<label class="check" style="min-height:32px;font-size:14px;font-family:var(--sans)" data-tname="${esc(t.tname)}">
       <input type="checkbox" value="${esc(t.tid)}"${selected.has(t.tid.trim()) ? ' checked' : ''}>${esc(t.tname)}</label>`).join('');
@@ -208,6 +210,35 @@ async function openRest(r) {
   showMsg($('#rest-msg'), '');
   rd.showModal();
 }
+// 餐廳照片：在瀏覽器先縮小成最寬 1200px 的 JPEG，再存進資料庫
+function showPic() {
+  const v = rf.picture.value;
+  $('#pic-preview').hidden = !v; $('#pic-clear').hidden = !v;
+  if (v) $('#pic-preview').src = imgSrc(v);
+}
+function shrinkImage(file, maxW = 1200) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, maxW / img.width);
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(img.src);
+      resolve(c.toDataURL('image/jpeg', 0.8));
+    };
+    img.onerror = () => reject(new Error('無法讀取這張圖片'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+$('#pic-file').addEventListener('change', async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try { rf.picture.value = await shrinkImage(f); showPic(); }
+  catch (err) { showMsg($('#rest-msg'), err.message); }
+  e.target.value = '';
+});
+$('#pic-clear').addEventListener('click', () => { rf.picture.value = ''; showPic(); });
 $('#tag-filter').addEventListener('input', (e) => {
   const q = e.target.value.trim();
   $$('#tag-picks [data-tname]').forEach((el) => { el.hidden = q && !el.dataset.tname.includes(q); });
