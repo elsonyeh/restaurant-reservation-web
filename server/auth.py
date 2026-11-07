@@ -48,7 +48,10 @@ def admin_required(fn):
     def wrapper(*args, **kwargs):
         if not g.user:
             return jsonify(error="請先登入"), 401
-        if g.user.get("role") != "admin":
+        # 以資料庫目前的身分為準（身分被調整後，不必等舊的 token 過期）
+        import db
+        row = db.fetch_one("SELECT role FROM Member WHERE mId = %s", (g.user.get("mid"),))
+        if not row or (row["role"] or "").strip() != "admin":
             return jsonify(error="需要管理者權限"), 403
         return fn(*args, **kwargs)
     return wrapper

@@ -65,6 +65,16 @@ def login():
     return {"token": make_token(member), "member": member}
 
 
+@bp.post("/refresh")
+@login_required
+def refresh():
+    """依資料庫目前的會員資料重新發 token（例如身分被改成管理者之後）。"""
+    m = db.fetch_one("SELECT mId, email, mName, role FROM Member WHERE mId = %s", (g.user["mid"],))
+    if not m:
+        raise ApiError(401, "請先登入")
+    return {"token": make_token(m), "member": m}
+
+
 @bp.get("/me")
 @login_required
 def me():

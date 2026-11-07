@@ -1,5 +1,5 @@
-import { api, esc, imgSrc, priceHtml, rate, showMsg, toast, requireLogin, splitDateTime, STATUS_LABEL, $, $$ } from '../api.js?v=20261107k';
-import { renderLayout } from '../layout.js?v=20261107k';
+import { api, esc, imgSrc, priceHtml, rate, showMsg, toast, requireLogin, splitDateTime, STATUS_LABEL, $, $$ } from '../api.js?v=20261107l';
+import { renderLayout } from '../layout.js?v=20261107l';
 
 const view = $('#view');
 let allTags = [];

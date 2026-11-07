@@ -1,9 +1,10 @@
 // 每一頁共用的頁首與頁尾
-import { auth, esc } from './api.js?v=20261107k';
+import { api, auth, esc } from './api.js?v=20261107l';
 
 const USER_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>';
 
 export function renderLayout(active) {
+  document.querySelectorAll('.site-header, .site-footer').forEach((el) => el.remove());
   const u = auth.user;
   const nav = [
     ['index.html', '找餐廳', 'home'],
@@ -34,6 +35,7 @@ export function renderLayout(active) {
 
   const logout = header.querySelector('#logout-btn');
   if (logout) logout.addEventListener('click', () => { auth.clear(); location.href = 'index.html'; });
+  syncUser(active);
 
   const footer = document.createElement('footer');
   footer.className = 'site-footer';
@@ -43,4 +45,18 @@ export function renderLayout(active) {
       <p class="small" style="margin:0;line-height:1.8">中山大學周邊餐廳訂位與評價<br>© 2026 留席 SAVED SEAT</p>
     </div>`;
   document.body.appendChild(footer);
+}
+
+// 每次開啟網站時，向後端確認一次會員身分；若身分有變（例如被設為管理者），更新登入資料與選單
+async function syncUser(active) {
+  const u = auth.user;
+  if (!u || !auth.token) return;
+  try { if (sessionStorage.getItem('gs_synced') === auth.token) return; } catch {}
+  try {
+    const { token, member } = await api('/refresh', { method: 'POST' });
+    const changed = member.role !== u.role || member.mname !== u.mname;
+    auth.save(token, member);
+    try { sessionStorage.setItem('gs_synced', token); } catch {}
+    if (changed) renderLayout(active);
+  } catch { /* 登入失效時 api() 會自行處理 */ }
 }
