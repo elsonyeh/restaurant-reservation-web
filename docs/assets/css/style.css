@@ -198,3 +198,5 @@ table.data input:not([type="checkbox"]), table.data select { height: 36px; }
   .hero-inner { padding: 96px 20px 36px; }
   .hero .cols > .col + .col { border-top-color: rgba(255,255,255,.28); }
 }
+
+@media (max-width: 520px) { .eyebrow { letter-spacing: .28em; } }

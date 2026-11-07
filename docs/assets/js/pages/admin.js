@@ -1,5 +1,5 @@
-import { api, esc, priceHtml, showMsg, toast, requireLogin, splitDateTime, STATUS_LABEL, $, $$ } from '../api.js?v=20261107c';
-import { renderLayout } from '../layout.js?v=20261107c';
+import { api, esc, priceHtml, rate, showMsg, toast, requireLogin, splitDateTime, STATUS_LABEL, $, $$ } from '../api.js?v=20261107d';
+import { renderLayout } from '../layout.js?v=20261107d';
 
 const view = $('#view');
 let allTags = [];
@@ -32,7 +32,7 @@ const views = {
         <div><dt>收錄餐廳</dt><dd>${t.restaurants}</dd><dd class="small">可線上預約 ${t.accept_res} 家</dd></div>
         <div><dt>會員</dt><dd>${t.members}</dd><dd class="small">不含管理者</dd></div>
         <div><dt>評論</dt><dd>${t.reviews}</dd><dd class="small">會員平均 ${t.avg_member ?? '—'} 分</dd></div>
-        <div><dt>待確認預約</dt><dd style="color:var(--rose)">${t.pending}</dd><dd class="small">Google 平均 ${t.avg_google ?? '—'}</dd></div>
+        <div><dt>待確認預約</dt><dd style="color:var(--rose)">${t.pending}</dd><dd class="small">等待處理</dd></div>
       </dl>
       <div class="grid2">
         <section class="panel"><h2>各價位餐廳數</h2><p class="small" style="margin:0 0 20px">依價位分類</p>
@@ -45,7 +45,7 @@ const views = {
         <section class="panel"><h2>預約最多的餐廳</h2><p class="small" style="margin:0 0 20px">不含已取消、已拒絕；括號內為平均人數</p>
           ${d.topReserved.length ? bars(d.topReserved, (x) => `${x.key}（${x.avg_size}）`) : '<p class="muted">尚無資料</p>'}</section>
         <section class="panel"><h2>會員評分最高的餐廳</h2><p class="small" style="margin:0 0 20px">會員平均評分，括號內為評論數</p>
-          ${d.topRated.length ? `<ul class="bars">${d.topRated.map((x) => `<li><span class="k" style="flex-basis:180px">${esc(x.key)}</span><span class="track"><span class="fill" style="width:${x.avg * 20}%"></span></span><span class="v">${x.avg}（${x.n}）</span></li>`).join('')}</ul>` : '<p class="muted">尚無資料</p>'}</section>
+          ${d.topRated.length ? `<ul class="bars">${d.topRated.map((x) => `<li><span class="k" style="flex-basis:180px">${esc(x.key)}</span><span class="track"><span class="fill" style="width:${x.avg * 20}%"></span></span><span class="v">${rate(x.avg)}（${x.n}）</span></li>`).join('')}</ul>` : '<p class="muted">尚無資料</p>'}</section>
       </div>`;
   },
 
@@ -65,7 +65,7 @@ const views = {
         <tbody>${d.items.map((r) => `
           <tr><td class="small">${esc(r.rid)}</td><td class="strong">${esc(r.rname)}</td><td>${esc(r.district)}</td>
             <td style="letter-spacing:.08em">${priceHtml(r.pricerange)}</td>
-            <td>${r.google_rate ?? '—'}（${r.google_num ?? 0}）</td><td>${r.acceptres ? '是' : '否'}</td><td>${r.capacity ?? '—'}</td>
+            <td>${rate(r.google_rate)}（${r.google_num ?? 0}）</td><td>${r.acceptres ? '是' : '否'}</td><td>${r.capacity ?? '—'}</td>
             <td style="white-space:nowrap">
               <button class="link-btn" data-edit="${esc(r.rid)}">編輯</button>
               <button class="link-btn" data-menu="${esc(r.rid)}" data-name="${esc(r.rname)}">招牌菜</button>

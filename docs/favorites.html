@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=20261107c">
-<script src="assets/js/config.js?v=20261107c"></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20261107d">
+<script src="assets/js/config.js?v=20261107d"></script>
 </head>
 <body class="page">
 <main class="wrap" style="padding-top:64px;padding-bottom:96px">
@@ -37,8 +37,8 @@
   </div>
 </main>
 <script type="module">
-  import { api, esc, priceHtml, showMsg, toast, requireLogin, $ } from './assets/js/api.js?v=20261107c';
-  import { renderLayout } from './assets/js/layout.js?v=20261107c';
+  import { api, esc, priceHtml, rate, showMsg, toast, requireLogin, $ } from './assets/js/api.js?v=20261107d';
+  import { renderLayout } from './assets/js/layout.js?v=20261107d';
   if (requireLogin()) {
     renderLayout('favorites');
     let lists = [];
@@ -78,7 +78,7 @@
               <span class="small" style="font-size:14px">${esc(r.district)}</span>
             </div>
             <span style="flex:0 0 64px;font-family:var(--sans);font-size:15px;letter-spacing:.08em">${priceHtml(r.pricerange)}</span>
-            <span style="flex:0 0 72px;font-size:17px;font-weight:500">★ ${r.google_rate ?? '—'}</span>
+            <span style="flex:0 0 72px;font-size:17px;font-weight:500">★ ${rate(r.google_rate)}</span>
             <button type="button" class="link-btn quiet" data-remove="${esc(r.rid)}">移出清單</button>
           </li>`).join('') || '<li class="empty">清單裡還沒有餐廳。</li>'}
         </ul>

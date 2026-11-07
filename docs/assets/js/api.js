@@ -32,7 +32,10 @@ export async function api(path, { method = 'GET', body, query } = {}) {
   let data = null;
   try { data = await res.json(); } catch { /* 沒有內容 */ }
   if (res.status === 401 && auth.token) {
+    // 登入已失效（例如過期）：清掉登入資料，回到登入頁後再回來
     auth.clear();
+    location.replace('login.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search));
+    throw new Error('登入已過期，請重新登入');
   }
   if (!res.ok) throw new Error((data && data.error) || `發生錯誤（${res.status}）`);
   return data;
@@ -49,6 +52,12 @@ export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 export function priceHtml(p) {
   const n = Number(p) || 0;
   return `<span aria-label="${['', '平價', '中價位', '高價位'][n] || ''}">${'$'.repeat(n)}<i style="font-style:normal;color:#C9BDBA">${'$'.repeat(Math.max(3 - n, 0))}</i></span>`;
+}
+
+/** 評分統一顯示一位小數（5 → 5.0），沒有評分顯示 — */
+export function rate(x) {
+  const n = Number(x);
+  return x == null || x === '' || !n ? '—' : n.toFixed(1);
 }
 
 export function stars(n) {

@@ -1,5 +1,5 @@
-import { api, auth, esc, priceHtml, stars, showMsg, today, toast, $ } from '../api.js?v=20261107c';
-import { renderLayout } from '../layout.js?v=20261107c';
+import { api, auth, esc, priceHtml, rate, stars, showMsg, today, toast, $ } from '../api.js?v=20261107d';
+import { renderLayout } from '../layout.js?v=20261107d';
 
 renderLayout('home');
 
@@ -49,9 +49,9 @@ function render() {
         <p class="eyebrow">${esc(r.district)}</p>
         <h1 style="margin:0;font-size:clamp(28px,4vw,40px);font-weight:400;letter-spacing:.06em;line-height:1.35">${esc(r.rname)}</h1>
         <div style="display:flex;flex-wrap:wrap;gap:8px 22px;font-size:15px;color:var(--body);align-items:baseline">
-          <span><b style="font-weight:500">★ ${r.google_rate ?? '—'}</b> <span class="small">Google · ${(r.google_num || 0).toLocaleString()} 則</span></span>
-          <span style="color:var(--line-strong)" aria-hidden="true">|</span>
-          <span><b style="font-weight:500">★ ${s.avg ?? '—'}</b> <span class="small">會員 · ${s.n} 則</span></span>
+          <span><b style="font-weight:500">★ ${rate(r.google_rate)}</b> <span class="small">Google · ${(r.google_num || 0).toLocaleString()} 則</span></span>
+          ${s.n ? `<span style="color:var(--line-strong)" aria-hidden="true">|</span>
+          <span><b style="font-weight:500">★ ${rate(s.avg)}</b> <span class="small">會員 · ${s.n} 則</span></span>` : ''}
           <span style="color:var(--line-strong)" aria-hidden="true">|</span>
           <span>${priceHtml(r.pricerange)}</span>
         </div>
@@ -147,12 +147,12 @@ function render() {
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:48px 64px">
       <div style="flex:1 1 280px;display:flex;flex-direction:column;gap:28px;min-width:0">
-        <div style="display:flex;align-items:baseline;gap:12px">
-          <span style="font-size:56px;font-weight:400;line-height:1">${s.avg ?? '—'}</span>
+        ${s.n ? `<div style="display:flex;align-items:baseline;gap:12px">
+          <span style="font-size:56px;font-weight:400;line-height:1">${rate(s.avg)}</span>
           <span style="font-size:15px;color:var(--muted)">/ 5・會員平均</span>
         </div>
-        <ul class="bars" style="font-size:13px;gap:10px">${dist}</ul>
-        <div style="border-top:1px solid var(--line);padding-top:24px">
+        <ul class="bars" style="font-size:13px;gap:10px">${dist}</ul>` : ''}
+        <div${s.n ? ' style="border-top:1px solid var(--line);padding-top:24px"' : ''}>
           ${!user ? `<p style="margin:0;font-size:15px">想留下評論？<a href="login.html?next=${encodeURIComponent('restaurant.html?id=' + rid)}" style="color:var(--rose-dark);border-bottom:1px solid var(--rose)">登入會員</a></p>`
             : myReview ? `<p style="margin:0;font-size:15px">你已經評論過這家店，可以到 <a href="member.html" style="color:var(--rose-dark);border-bottom:1px solid var(--rose)">會員中心</a> 修改。</p>`
             : `<form id="rev-form" class="form" style="gap:14px">

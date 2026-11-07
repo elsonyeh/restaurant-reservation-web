@@ -1,5 +1,5 @@
-import { api, esc, priceHtml, $ } from '../api.js?v=20261107c';
-import { renderLayout } from '../layout.js?v=20261107c';
+import { api, esc, priceHtml, rate, $ } from '../api.js?v=20261107d';
+import { renderLayout } from '../layout.js?v=20261107d';
 
 renderLayout('home');
 
@@ -56,7 +56,7 @@ async function loadList() {
           <div class="tags chips">${(r.tags || []).slice(0, 4).map((t) => `<span class="chip">${esc(t)}</span>`).join('')}</div>
           <div class="price">${priceHtml(r.pricerange)}</div>
           <div class="rate">
-            <b>★ ${r.google_rate ?? '—'}</b>
+            <b>★ ${rate(r.google_rate)}</b>
             <span class="small">(${r.google_num ? r.google_num.toLocaleString() : 0})</span>
           </div>
           <a class="go" href="restaurant.html?id=${r.rid}">查看餐廳</a>
