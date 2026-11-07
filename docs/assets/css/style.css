@@ -164,6 +164,7 @@ dialog::backdrop { background: rgba(43, 37, 35, .4); }
 .site-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; }
 
 .page { min-height: 100vh; display: flex; flex-direction: column; }
+.page > main { width: 100%; box-sizing: border-box; }
 main { flex: 1 1 auto; }
 .toast { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); background: var(--ink); color: #fff;
   font-family: var(--sans); font-size: 14px; padding: 12px 20px; z-index: 50; max-width: calc(100% - 40px); }
@@ -200,3 +201,11 @@ table.data input:not([type="checkbox"]), table.data select { height: 36px; }
 }
 
 @media (max-width: 520px) { .eyebrow { letter-spacing: .28em; } }
+
+/* 我的預約：日期｜餐廳資訊｜狀態與操作 */
+.res-row { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 12px 32px; align-items: center; padding: 28px 0; border-bottom: 1px solid var(--line); }
+.res-side { display: flex; flex-direction: column; align-items: flex-end; gap: 14px; }
+@media (max-width: 600px) {
+  .res-row { grid-template-columns: 64px minmax(0, 1fr); gap: 14px 20px; }
+  .res-side { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; }
+}

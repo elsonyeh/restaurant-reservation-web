@@ -7,18 +7,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=20261107h">
-<script src="assets/js/config.js?v=20261107h"></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20261107j">
+<script src="assets/js/config.js?v=20261107j"></script>
 </head>
 <body class="page">
 <main class="wrap" style="padding-top:64px;padding-bottom:96px">
   <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:32px">
     <div><p class="eyebrow">RESERVATIONS</p><h1 class="page-title">我的預約</h1></div>
-    <a href="index.html" class="btn">新增預約</a>
+    <a href="index.html" class="btn">預約餐廳</a>
   </div>
   <div role="tablist" aria-label="預約狀態" id="tabs" style="display:flex;flex-wrap:wrap;gap:4px 32px;border-bottom:1px solid var(--ink)"></div>
   <ol id="list" style="margin:0;padding:0;list-style:none"><li class="loading">載入中…</li></ol>
-  <p class="small" style="margin-top:32px;line-height:1.9">只有「待確認」的預約可以修改。</p>
+  <p class="small" style="margin-top:32px;line-height:1.9">「待確認」的預約可以直接修改；已確認的預約如果要更改，請取消後重新預約。</p>
 </main>
 
 <dialog id="edit-dialog" aria-labelledby="edit-h">
@@ -40,8 +40,8 @@
 </dialog>
 
 <script type="module">
-  import { api, esc, showMsg, splitDateTime, toast, today, requireLogin, STATUS_LABEL, $ } from './assets/js/api.js?v=20261107h';
-  import { renderLayout } from './assets/js/layout.js?v=20261107h';
+  import { api, esc, showMsg, splitDateTime, toast, today, requireLogin, STATUS_LABEL, $ } from './assets/js/api.js?v=20261107j';
+  import { renderLayout } from './assets/js/layout.js?v=20261107j';
   const SLOTS = ['11:30', '12:00', '12:30', '13:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'];
   if (requireLogin()) {
     renderLayout('reservations');
@@ -49,6 +49,7 @@
     let items = [];
     let editing = null;
     const TABS = [['upcoming', '即將到來'], ['done', '已完成'], ['cancelled', '已取消'], ['all', '全部']];
+    const EMPTY = { upcoming: '目前沒有即將到來的預約。', done: '還沒有完成的預約。', cancelled: '沒有取消的預約。', all: '還沒有預約紀錄。' };
 
     async function load() {
       const data = await api('/me/reservations', { query: { tab } });
@@ -63,25 +64,27 @@
         const canCancel = ['pending', 'confirmed'].includes(r.status) && r.upcoming;
         const canReview = !r.reviewed && (r.status === 'completed' || (r.status === 'confirmed' && !r.upcoming));
         return `
-        <li style="display:flex;flex-wrap:wrap;align-items:center;gap:16px 36px;padding:28px 0;border-bottom:1px solid var(--line)">
-          <div style="flex:0 0 96px;display:flex;flex-direction:column;gap:2px">
+        <li class="res-row">
+          <div style="display:flex;flex-direction:column;gap:2px">
             <span style="font-size:13px;color:var(--rose);letter-spacing:.2em">${d.month}</span>
             <span style="font-size:34px;line-height:1.1">${d.day}</span>
             <span class="small">${d.week}</span>
           </div>
-          <div style="flex:1 1 260px;display:flex;flex-direction:column;gap:6px;min-width:0">
+          <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
             <a href="restaurant.html?id=${encodeURIComponent(r.rid)}" style="font-size:20px;font-weight:500">${esc(r.rname)}</a>
             <span class="small" style="font-size:14px;color:var(--muted)">${d.time}・${r.partysize} 位・預約編號 ${esc(r.resid)}</span>
             ${r.note ? `<span class="small">備註：${esc(r.note)}</span>` : ''}
           </div>
+          <div class="res-side">
           <span class="badge ${esc(r.status)}">${STATUS_LABEL[r.status] || esc(r.status)}</span>
-          <div style="flex:0 0 auto;display:flex;gap:20px">
+          <div style="display:flex;gap:20px">
             ${canEdit ? `<button type="button" class="link-btn" data-edit="${esc(r.resid)}">修改</button>` : ''}
             ${canCancel ? `<button type="button" class="link-btn quiet" data-cancel="${esc(r.resid)}">取消預約</button>` : ''}
             ${canReview ? `<a class="link-btn" href="restaurant.html?id=${encodeURIComponent(r.rid)}#rev-h">寫評論</a>` : ''}
           </div>
+          </div>
         </li>`;
-      }).join('') : '<li class="empty">這裡還沒有預約紀錄。</li>';
+      }).join('') : `<li class="empty">${EMPTY[tab]}${tab === 'upcoming' || tab === 'all' ? '　<a href="index.html" style="color:var(--rose-dark);border-bottom:1px solid var(--rose)">去找餐廳</a>' : ''}</li>`;
     }
 
     $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) { tab = b.dataset.tab; load(); } });

@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=20261107h">
-<script src="assets/js/config.js?v=20261107h"></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20261107j">
+<script src="assets/js/config.js?v=20261107j"></script>
 </head>
 <body class="page">
 <main class="wrap" style="padding-top:64px;padding-bottom:96px">
@@ -19,7 +19,8 @@
   <div class="cols" style="padding-top:40px">
     <aside class="col" aria-label="收藏清單" style="flex:1 1 280px;display:flex;flex-direction:column;gap:28px">
       <ul id="lists" style="margin:0;padding:0;list-style:none"></ul>
-      <form id="new-form" class="form" style="gap:14px;border-top:1px solid var(--line);padding-top:24px">
+      <button type="button" class="btn btn-outline" id="new-open" style="align-self:flex-start">＋ 新增清單</button>
+      <form id="new-form" class="form" hidden style="gap:14px;border-top:1px solid var(--line);padding-top:24px">
         <p style="margin:0;font-size:17px;font-weight:500" id="form-title">新增清單</p>
         <label class="field">清單名稱<input type="text" name="fName" required maxlength="50" placeholder="例如：聚餐名單"></label>
         <label class="field">說明（選填）<input type="text" name="description" maxlength="200"></label>
@@ -27,7 +28,7 @@
         <p class="msg err" id="new-msg" hidden></p>
         <div class="row" style="gap:10px">
           <button type="submit" class="btn btn-outline">儲存</button>
-          <button type="button" class="btn btn-quiet" id="form-reset" hidden>取消編輯</button>
+          <button type="button" class="btn btn-quiet" id="form-reset">取消</button>
         </div>
       </form>
     </aside>
@@ -37,8 +38,8 @@
   </div>
 </main>
 <script type="module">
-  import { api, esc, priceHtml, rate, showMsg, toast, requireLogin, $ } from './assets/js/api.js?v=20261107h';
-  import { renderLayout } from './assets/js/layout.js?v=20261107h';
+  import { api, esc, priceHtml, rate, showMsg, toast, requireLogin, $ } from './assets/js/api.js?v=20261107j';
+  import { renderLayout } from './assets/js/layout.js?v=20261107j';
   if (requireLogin()) {
     renderLayout('favorites');
     let lists = [];
@@ -58,10 +59,10 @@
           style="width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);border-left:2px solid ${l.fid === sel ? 'var(--rose)' : 'transparent'};background:${l.fid === sel ? 'var(--blush)' : '#fff'};padding:16px;cursor:pointer;min-height:64px">
           <span style="display:block;font-size:17px;font-weight:500">${esc(l.fname)}</span>
           <span class="small">${l.n} 家・${l.ispublic ? '公開' : '不公開'}</span>
-        </button></li>`).join('') || '<li class="small" style="padding:8px 0">還沒有收藏清單。</li>';
+        </button></li>`).join('');
 
       const cur = lists.find((l) => l.fid === sel);
-      $('#current').innerHTML = !cur ? '<p class="empty">在左邊建立第一份清單，再到餐廳頁按「加入收藏」。</p>' : `
+      $('#current').innerHTML = !cur ? '<p class="empty">還沒有收藏清單。先按「新增清單」建立一份，再到餐廳頁按「加入收藏」。</p>' : `
         <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:12px 24px">
           <h2 id="cur-h" style="margin:0;font-size:24px;font-weight:500;letter-spacing:.04em">${esc(cur.fname)}</h2>
           <div style="display:flex;gap:20px">
@@ -86,26 +87,35 @@
     }
 
     function resetForm() {
-      editingId = null; form.reset();
-      $('#form-title').textContent = '新增清單'; $('#form-reset').hidden = true; showMsg($('#new-msg'), '');
+      editingId = null; form.reset(); form.hidden = true; $('#new-open').hidden = false;
+      $('#form-title').textContent = '新增清單'; showMsg($('#new-msg'), '');
     }
+    function openForm(title) {
+      $('#form-title').textContent = title; form.hidden = false; $('#new-open').hidden = true;
+      form.scrollIntoView({ behavior: 'smooth', block: 'center' }); form.fName.focus({ preventScroll: true });
+    }
+    $('#new-open').addEventListener('click', () => { resetForm(); openForm('新增清單'); });
 
     $('#lists').addEventListener('click', (e) => { const b = e.target.closest('[data-sel]'); if (b) { sel = b.dataset.sel; render(); } });
     $('#current').addEventListener('click', async (e) => {
       const cur = lists.find((l) => l.fid === sel);
       if (e.target.id === 'edit-list') {
         editingId = cur.fid; form.fName.value = cur.fname; form.description.value = cur.description || ''; form.isPublic.checked = cur.ispublic;
-        $('#form-title').textContent = '編輯清單'; $('#form-reset').hidden = false; form.fName.focus();
+        openForm('編輯清單');
       }
       if (e.target.id === 'del-list') {
         const b = e.target;
-        if (b.dataset.confirm !== '1') { b.dataset.confirm = '1'; b.textContent = '確定刪除整份清單？'; b.style.color = 'var(--err)'; return; }
+        if (b.dataset.confirm !== '1') {
+          b.dataset.confirm = '1'; b.textContent = '確定刪除整份清單？'; b.style.color = 'var(--err)';
+          setTimeout(() => { if (b.isConnected) { b.dataset.confirm = ''; b.textContent = '刪除清單'; b.style.color = ''; } }, 4000);
+          return;
+        }
         try { await api('/favlists/' + encodeURIComponent(cur.fid), { method: 'DELETE' }); toast('清單已刪除'); sel = null; load(); }
         catch (err) { toast(err.message); }
       }
       const rm = e.target.closest('[data-remove]');
       if (rm) {
-        try { await api(`/favlists/${encodeURIComponent(cur.fid)}/restaurants/${encodeURIComponent(rm.dataset.remove)}`, { method: 'DELETE' }); load(); }
+        try { await api(`/favlists/${encodeURIComponent(cur.fid)}/restaurants/${encodeURIComponent(rm.dataset.remove)}`, { method: 'DELETE' }); toast('已移出清單'); load(); }
         catch (err) { toast(err.message); }
       }
     });
