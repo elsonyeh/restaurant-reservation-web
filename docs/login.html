@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=20261107g">
-<script src="assets/js/config.js?v=20261107g"></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20261107h">
+<script src="assets/js/config.js?v=20261107h"></script>
 </head>
 <body class="page">
 <main class="marble" style="padding:80px 20px 96px">
@@ -35,6 +35,7 @@
           <label class="field">姓名<input type="text" name="mName" autocomplete="name" required maxlength="100"></label>
           <label class="field">電子信箱<input type="email" name="email" autocomplete="email" required></label>
           <label class="field">密碼（至少 8 個字元）<input type="password" name="password" autocomplete="new-password" minlength="8" required></label>
+          <label class="field">再次輸入密碼<input type="password" name="password2" autocomplete="new-password" minlength="8" required></label>
           <div class="row">
             <label class="field">生日<input type="date" name="birthday"></label>
             <label class="field">手機<input type="tel" name="phone" autocomplete="tel" placeholder="09xx-xxx-xxx" maxlength="20"></label>
@@ -47,8 +48,8 @@
   </div>
 </main>
 <script type="module">
-  import { api, auth, showMsg, $ } from './assets/js/api.js?v=20261107g';
-  import { renderLayout } from './assets/js/layout.js?v=20261107g';
+  import { api, auth, showMsg, $ } from './assets/js/api.js?v=20261107h';
+  import { renderLayout } from './assets/js/layout.js?v=20261107h';
   renderLayout('');
 
   const next = new URLSearchParams(location.search).get('next');
@@ -68,6 +69,11 @@
   $('#reg-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = e.target;
+    if (f.password.value !== f.password2.value) {
+      showMsg($('#reg-msg'), '兩次輸入的密碼不一樣');
+      f.password2.focus();
+      return;
+    }
     try {
       const { token, member } = await api('/register', { method: 'POST', body: {
         mName: f.mName.value, email: f.email.value, password: f.password.value, birthday: f.birthday.value || null, phone: f.phone.value } });

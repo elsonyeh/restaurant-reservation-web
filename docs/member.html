@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=20261107g">
-<script src="assets/js/config.js?v=20261107g"></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20261107h">
+<script src="assets/js/config.js?v=20261107h"></script>
 </head>
 <body class="page">
 <main class="wrap" style="padding-top:64px;padding-bottom:96px">
@@ -31,6 +31,7 @@
           <label class="field">手機<input type="tel" name="phone" maxlength="20"></label>
         </div>
         <label class="field">新密碼（不修改請留空）<input type="password" name="password" autocomplete="new-password" minlength="8"></label>
+        <label class="field">再次輸入新密碼<input type="password" name="password2" autocomplete="new-password" minlength="8"></label>
         <div class="row" style="align-items:center">
           <button type="submit" class="btn">儲存變更</button>
           <p class="msg" id="pf-msg" role="status" hidden></p>
@@ -62,8 +63,8 @@
 </dialog>
 
 <script type="module">
-  import { api, auth, esc, stars, showMsg, toast, requireLogin, $ } from './assets/js/api.js?v=20261107g';
-  import { renderLayout } from './assets/js/layout.js?v=20261107g';
+  import { api, auth, esc, stars, showMsg, toast, requireLogin, $ } from './assets/js/api.js?v=20261107h';
+  import { renderLayout } from './assets/js/layout.js?v=20261107h';
   if (requireLogin()) {
     renderLayout('member');
     const form = $('#pf-form');
@@ -98,11 +99,16 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (form.password.value !== form.password2.value) {
+        showMsg($('#pf-msg'), '兩次輸入的新密碼不一樣');
+        form.password2.focus();
+        return;
+      }
       try {
         const { member, token } = await api('/me', { method: 'PUT', body: {
           mName: form.mName.value, birthday: form.birthday.value || null, phone: form.phone.value, password: form.password.value } });
         auth.save(token, member);
-        form.password.value = '';
+        form.password.value = ''; form.password2.value = '';
         showMsg($('#pf-msg'), '已儲存', true);
         loadMe();
       } catch (err) { showMsg($('#pf-msg'), err.message); }
