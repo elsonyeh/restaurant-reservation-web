@@ -1,5 +1,5 @@
-import { api, auth, esc, imgSrc, priceHtml, rate, stars, showMsg, today, toast, $ } from '../api.js?v=20261107j';
-import { renderLayout } from '../layout.js?v=20261107j';
+import { api, auth, esc, imgSrc, priceHtml, rate, stars, showMsg, today, toast, $ } from '../api.js?v=20261107k';
+import { renderLayout } from '../layout.js?v=20261107k';
 
 renderLayout('home');
 
@@ -80,6 +80,12 @@ function render() {
       <div class="col">
         <h2 class="h-col" style="margin-bottom:22px">TAGS</h2>
         <div class="chips">${r.tags.length ? r.tags.map((t) => `<span class="chip" style="font-size:14px;padding:6px 12px">${esc(t)}</span>`).join('') : '<span class="muted">尚無標籤</span>'}</div>
+        ${(r.public_lists || []).length ? `
+        <p style="margin:32px 0 12px;font-size:15px;color:var(--body)">被收錄在 ${r.public_lists.length} 份公開清單</p>
+        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">
+          ${r.public_lists.map((l) => `<li style="font-size:15px"${l.description ? ` title="${esc(l.description)}"` : ''}>
+            <span style="font-weight:500">${esc(l.fname)}</span><span class="small">・${esc(l.owner)} 的清單</span></li>`).join('')}
+        </ul>` : ''}
       </div>
     </div>
   </div>

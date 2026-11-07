@@ -82,7 +82,7 @@ def list_restaurants():
 @bp.get("/restaurants/<rid>")
 def restaurant_detail(rid):
     rid = clean_id(rid, "餐廳編號")
-    # 一次查詢取回餐廳、標籤、招牌菜、評論與評分統計（減少和資料庫往返的次數）
+    # 一次查詢取回餐廳、標籤、招牌菜、評論、評分統計與收錄這家店的公開收藏清單（減少和資料庫往返的次數）
     rest = db.fetch_one(
         f"""SELECT r.rId, r.rName, r.address, r.priceRange, r.maxPartySize, r.capacity, r.acceptRes,
                    r.google_rate, r.google_num, {PICTURE_SQL} AS picture, {DISTRICT_SQL} AS district,
@@ -102,7 +102,11 @@ def restaurant_detail(rid):
                               's5', COUNT(*) FILTER (WHERE rating = 5), 's4', COUNT(*) FILTER (WHERE rating = 4),
                               's3', COUNT(*) FILTER (WHERE rating = 3), 's2', COUNT(*) FILTER (WHERE rating = 2),
                               's1', COUNT(*) FILTER (WHERE rating = 1))
-                      FROM Review WHERE rId = r.rId) AS review_summary
+                      FROM Review WHERE rId = r.rId) AS review_summary,
+                   (SELECT COALESCE(json_agg(json_build_object('fname', f.fName, 'description', f.description,
+                                                               'owner', COALESCE(mb.mName, '會員')) ORDER BY f.fId), '[]')
+                      FROM Contains c JOIN Favlist f ON f.fId = c.fId LEFT JOIN Member mb ON mb.mId = f.mId
+                     WHERE c.rId = r.rId AND f.isPublic) AS public_lists
               FROM Restaurant r WHERE r.rId = %s""", (rid,)
     )
     if not rest:

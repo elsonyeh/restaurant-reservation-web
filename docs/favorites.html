@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=20261107j">
-<script src="assets/js/config.js?v=20261107j"></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20261107k">
+<script src="assets/js/config.js?v=20261107k"></script>
 </head>
 <body class="page">
 <main class="wrap" style="padding-top:64px;padding-bottom:96px">
@@ -24,7 +24,7 @@
         <p style="margin:0;font-size:17px;font-weight:500" id="form-title">新增清單</p>
         <label class="field">清單名稱<input type="text" name="fName" required maxlength="50" placeholder="例如：聚餐名單"></label>
         <label class="field">說明（選填）<input type="text" name="description" maxlength="200"></label>
-        <label class="check"><input type="checkbox" name="isPublic">公開這份清單</label>
+        <label class="check"><input type="checkbox" name="isPublic">公開這份清單（清單名稱會顯示在餐廳頁）</label>
         <p class="msg err" id="new-msg" hidden></p>
         <div class="row" style="gap:10px">
           <button type="submit" class="btn btn-outline">儲存</button>
@@ -38,8 +38,8 @@
   </div>
 </main>
 <script type="module">
-  import { api, esc, priceHtml, rate, showMsg, toast, requireLogin, $ } from './assets/js/api.js?v=20261107j';
-  import { renderLayout } from './assets/js/layout.js?v=20261107j';
+  import { api, esc, priceHtml, rate, showMsg, toast, requireLogin, $ } from './assets/js/api.js?v=20261107k';
+  import { renderLayout } from './assets/js/layout.js?v=20261107k';
   if (requireLogin()) {
     renderLayout('favorites');
     let lists = [];
