@@ -231,7 +231,10 @@ def list_reservations():
               LEFT JOIN Member m ON m.mId = s.mId
              WHERE {cond}
              ORDER BY s.dateTime DESC LIMIT 100""", params)
-    return {"items": rows}
+    counts = {r["status"]: r["n"] for r in db.fetch_all(
+        "SELECT TRIM(status) AS status, COUNT(*) AS n FROM Reserve GROUP BY TRIM(status)")}
+    counts[""] = sum(counts.values())
+    return {"items": rows, "counts": counts}
 
 
 @bp.patch("/reservations/<res_id>")

@@ -1,5 +1,5 @@
-import { api, esc, imgSrc, priceHtml, rate, showMsg, toast, requireLogin, splitDateTime, STATUS_LABEL, $, $$ } from '../api.js?v=20261107l';
-import { renderLayout } from '../layout.js?v=20261107l';
+import { api, auth, esc, imgSrc, priceHtml, rate, showMsg, toast, requireLogin, splitDateTime, STATUS_LABEL, $, $$ } from '../api.js?v=20261107m';
+import { renderLayout } from '../layout.js?v=20261107m';
 
 const view = $('#view');
 let allTags = [];
@@ -54,18 +54,18 @@ const views = {
     const pages = Math.ceil(d.total / d.pageSize);
     view.innerHTML = `
       <p class="eyebrow">RESTAURANTS</p>
-      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;padding-bottom:24px;border-bottom:1px solid var(--ink)">
-        <h1 class="page-title" style="font-size:30px">餐廳與招牌菜</h1>
-        <form id="rq" class="row" style="gap:10px"><label class="field" style="flex:1 1 220px">搜尋餐廳<input type="search" name="q" value="${esc(q)}" placeholder="店名或地址"></label>
-          <button class="btn btn-quiet btn-sm" type="submit">搜尋</button>
-          <button class="btn btn-dark btn-sm" type="button" id="add-rest">＋ 新增餐廳</button></form>
+      <h1 class="page-title" style="font-size:30px;padding-bottom:24px;border-bottom:1px solid var(--ink)">餐廳與招牌菜</h1>
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;margin:24px 0 8px">
+        <form id="rq" class="row" style="gap:10px;flex:1 1 420px;align-items:flex-end"><label class="field" style="flex:0 1 320px">搜尋餐廳<input type="search" name="q" value="${esc(q)}" placeholder="店名或地址"></label>
+          <button class="btn btn-quiet btn-sm" type="submit">搜尋</button></form>
+        <button class="btn btn-dark btn-sm" type="button" id="add-rest">＋ 新增餐廳</button>
       </div>
       <div class="table-box" style="margin-top:8px"><table class="data" style="min-width:860px">
         <thead><tr><th>編號</th><th>餐廳名稱</th><th>區域</th><th>價位</th><th>Google</th><th>預約</th><th>座位</th><th>操作</th></tr></thead>
         <tbody>${d.items.map((r) => `
           <tr><td class="small">${esc(r.rid)}</td><td class="strong">${esc(r.rname)}</td><td>${esc(r.district)}</td>
             <td style="letter-spacing:.08em">${priceHtml(r.pricerange)}</td>
-            <td>${rate(r.google_rate)}（${r.google_num ?? 0}）</td><td>${r.acceptres ? '是' : '否'}</td><td>${r.capacity ?? '—'}</td>
+            <td>${r.google_rate ? `${rate(r.google_rate)}（${(r.google_num || 0).toLocaleString()}）` : '—'}</td><td>${r.acceptres ? '是' : '否'}</td><td>${r.capacity ?? '—'}</td>
             <td style="white-space:nowrap">
               <button class="link-btn" data-edit="${esc(r.rid)}">編輯</button>
               <button class="link-btn" data-menu="${esc(r.rid)}" data-name="${esc(r.rname)}">招牌菜</button>
@@ -97,7 +97,7 @@ const views = {
     view.innerHTML = `
       <p class="eyebrow">RESERVATIONS</p><h1 class="page-title" style="font-size:30px;padding-bottom:16px">預約管理</h1>
       <div role="tablist" style="display:flex;flex-wrap:wrap;gap:4px 28px;border-bottom:1px solid var(--ink)">
-        ${tabs.map(([k, l]) => `<button role="tab" aria-selected="${k === status}" data-status="${k}" style="background:none;border:0;padding:12px 0;margin-bottom:-1px;cursor:pointer;min-height:44px;font-size:15px;border-bottom:2px solid ${k === status ? 'var(--rose)' : 'transparent'}">${l}</button>`).join('')}
+        ${tabs.map(([k, l]) => `<button role="tab" aria-selected="${k === status}" data-status="${k}" style="background:none;border:0;padding:12px 0;margin-bottom:-1px;cursor:pointer;min-height:44px;font-size:15px;color:${k === status ? 'var(--ink)' : 'var(--muted)'};border-bottom:2px solid ${k === status ? 'var(--rose)' : 'transparent'}">${l} <span class="small">${(d.counts || {})[k] ?? 0}</span></button>`).join('')}
       </div>
       <div class="table-box"><table class="data" style="min-width:900px">
         <thead><tr><th>編號</th><th>會員</th><th>餐廳</th><th>日期時間</th><th>人數</th><th>該時段剩餘</th><th>狀態</th><th>操作</th></tr></thead>
@@ -108,7 +108,7 @@ const views = {
             <td style="white-space:nowrap">
               ${r.status === 'pending' ? `<button class="btn btn-sm" data-set="confirmed" data-id="${esc(r.resid)}">確認</button> <button class="btn btn-quiet btn-sm" data-set="rejected" data-id="${esc(r.resid)}">拒絕</button>` : ''}
               ${r.status === 'confirmed' ? `<button class="btn btn-quiet btn-sm" data-set="completed" data-id="${esc(r.resid)}">標記完成</button>` : ''}
-            </td></tr>`).join('') || '<tr><td colspan="8" class="empty">沒有資料</td></tr>'}
+            </td></tr>`).join('') || `<tr><td colspan="8" class="empty">${status === 'pending' ? '目前沒有待確認的預約。' : '沒有這個狀態的預約。'}</td></tr>`}
         </tbody></table></div>`;
     view.onclick = async (e) => {
       const b = e.target.closest('button');
@@ -163,13 +163,15 @@ const views = {
 
   async members() {
     const { items } = await api('/admin/members');
+    const me = (auth.user?.mid || '').trim();
     view.innerHTML = `
       <p class="eyebrow">MEMBERS</p><h1 class="page-title" style="font-size:30px;padding-bottom:24px;border-bottom:1px solid var(--ink)">會員管理</h1>
       <div class="table-box"><table class="data" style="min-width:820px"><thead><tr><th>編號</th><th>姓名</th><th>信箱</th><th>手機</th><th>評論</th><th>預約</th><th>身分</th><th></th></tr></thead>
         <tbody>${items.map((m) => `<tr><td class="small">${esc(m.mid)}</td><td class="strong">${esc(m.mname)}</td><td>${esc(m.email)}</td><td>${esc(m.phone || '')}</td>
           <td>${m.reviews}</td><td>${m.reservations}</td>
-          <td><select data-role="${esc(m.mid)}" aria-label="身分" style="padding:6px 10px;width:auto"><option value="user"${m.role !== 'admin' ? ' selected' : ''}>一般會員</option><option value="admin"${m.role === 'admin' ? ' selected' : ''}>管理者</option></select></td>
-          <td><button class="link-btn quiet" data-del="${esc(m.mid)}">刪除</button></td></tr>`).join('')}</tbody></table></div>`;
+          <td>${(m.mid || '').trim() === me ? '<span class="small">管理者（你）</span>'
+            : `<select data-role="${esc(m.mid)}" aria-label="身分" style="width:136px;padding-top:0;padding-bottom:0;padding-left:12px;font-size:14px"><option value="user"${m.role !== 'admin' ? ' selected' : ''}>一般會員</option><option value="admin"${m.role === 'admin' ? ' selected' : ''}>管理者</option></select>`}</td>
+          <td>${(m.mid || '').trim() === me ? '' : `<button class="link-btn quiet" data-del="${esc(m.mid)}">刪除</button>`}</td></tr>`).join('')}</tbody></table></div>`;
     view.onchange = async (e) => {
       const s = e.target.closest('[data-role]');
       if (!s) return;
